@@ -22,7 +22,7 @@ public class User {
     @Column(length = 100, nullable = false, unique = true)
     private String providerId;
 
-    @Column(length = 10)
+    @Column(length = 50)
     private String name;
 
     @Column(name = "image_url", columnDefinition = "TEXT")
@@ -31,4 +31,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserStatus status;
+
+    public void updateUserInfo(String name, String imageUrl) {
+        this.name = name;
+        this.imageUrl = imageUrl;
+    }
 }
