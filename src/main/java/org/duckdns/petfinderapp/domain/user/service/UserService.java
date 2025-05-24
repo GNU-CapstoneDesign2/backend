@@ -6,4 +6,6 @@ import org.duckdns.petfinderapp.domain.user.entity.User;
 
 public interface UserService {
 	UserInfoResponse updateUserInfo(User user, UserUpdateRequest userUpdateRequest);
+
+	void deleteUser(User user);
 }

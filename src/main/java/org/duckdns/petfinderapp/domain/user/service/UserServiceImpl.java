@@ -21,4 +21,10 @@ public class UserServiceImpl implements UserService {
 
 		return UserInfoResponse.of(savedUser);
 	}
+
+	@Override
+	public void deleteUser(User user) {
+		user.deactivate();
+		userRepository.save(user);
+	}
 }
