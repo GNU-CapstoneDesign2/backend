@@ -36,4 +36,8 @@ public class User {
         this.name = name;
         this.imageUrl = imageUrl;
     }
+
+    public void deactivate() {
+        this.status = UserStatus.DEACTIVATE;
+    }
 }
