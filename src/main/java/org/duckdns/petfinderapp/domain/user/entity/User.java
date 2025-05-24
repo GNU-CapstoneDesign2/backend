@@ -16,8 +16,11 @@ public class User {
     @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
     private Long id;
 
+    @Column(length = 50, nullable = false)
+    private String provider;
+
     @Column(length = 100, nullable = false, unique = true)
-    private String email;
+    private String providerId;
 
     @Column(length = 10)
     private String name;
