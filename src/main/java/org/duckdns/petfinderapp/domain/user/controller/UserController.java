@@ -8,6 +8,7 @@ import org.duckdns.petfinderapp.global.template.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,5 +43,11 @@ public class UserController {
 			"내 정보 수정 성공",
 			data
 		);
+	}
+
+	@DeleteMapping("/me")
+	public ApiResponse<Void> deleteUser(@AuthenticationPrincipal User user) {
+		userService.deleteUser(user);
+		return ApiResponse.onSuccess(HttpStatus.NO_CONTENT, "회원 탈퇴 성공", null);
 	}
 }
