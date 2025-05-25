@@ -46,7 +46,9 @@ public class UserController {
 	}
 
 	@DeleteMapping("/me")
-	public ApiResponse<Void> deleteUser(@AuthenticationPrincipal User user) {
+	public ApiResponse<Void> deleteUser(
+		@AuthenticationPrincipal User user
+	) {
 		userService.deleteUser(user);
 		return ApiResponse.onSuccess(HttpStatus.NO_CONTENT, "회원 탈퇴 성공", null);
 	}
