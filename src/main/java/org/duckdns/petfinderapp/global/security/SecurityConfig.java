@@ -21,9 +21,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 	private final JwtTokenProvider jwtTokenProvider;
+	private final RestAuthenticationEntryPoint entryPoint;
+	private final RestAccessDeniedHandler accessDeniedHandler;
+	private final UserRepository userRepository;
+	private final TokenBlackListService blackListService;
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http, UserRepository userRepository) throws Exception {
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
 			.cors(Customizer.withDefaults())
 			// CSRF 완전 비활성화
@@ -31,6 +35,10 @@ public class SecurityConfig {
 			// stateless 세션 정책
 			.sessionManagement(sm -> sm
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+			)
+			.exceptionHandling(ex -> ex
+				.authenticationEntryPoint(entryPoint)
+				.accessDeniedHandler(accessDeniedHandler)
 			)
 			// 권한 검사 설정
 			.authorizeHttpRequests(auth -> auth
@@ -43,7 +51,7 @@ public class SecurityConfig {
 
 			// JWT 필터 적용
 		http.addFilterBefore(
-			new JwtAuthenticationFilter(jwtTokenProvider, userRepository),
+			new JwtAuthenticationFilter(jwtTokenProvider, userRepository, blackListService),
 			UsernamePasswordAuthenticationFilter.class
 		);
 
