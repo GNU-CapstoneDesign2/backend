@@ -13,6 +13,8 @@ import lombok.Setter;
 public class KakaoProperties {
 	private String tokenUrl;
 	private String userInfoUri;
+	private String logoutUrl;
+	private String unlinkUrl;
 	private String clientId;
 	private String clientSecret;
 	private String redirectUri;
