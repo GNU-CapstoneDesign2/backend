@@ -3,6 +3,8 @@ package org.duckdns.petfinderapp.domain.user.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.duckdns.petfinderapp.domain.user.enums.UserStatus;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
@@ -10,6 +12,8 @@ import org.duckdns.petfinderapp.domain.user.enums.UserStatus;
 @AllArgsConstructor
 @Table(name = "users")
 @Builder
+@SQLDelete(sql = "UPDATE users SET status = 'DEACTIVATE' WHERE id = ?")
+@SQLRestriction("status <> 'DEACTIVATE'")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
@@ -19,7 +23,7 @@ public class User {
     @Column(length = 50, nullable = false)
     private String provider;
 
-    @Column(length = 100, nullable = false, unique = true)
+    @Column(name = "provider_id", length = 100, nullable = false, unique = true)
     private String providerId;
 
     @Column(length = 50)
@@ -28,8 +32,8 @@ public class User {
     @Column(name = "image_url", columnDefinition = "TEXT")
     private String imageUrl;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private UserStatus status;
 
     public void updateUserInfo(String name, String imageUrl) {
@@ -37,7 +41,8 @@ public class User {
         this.imageUrl = imageUrl;
     }
 
-    public void deactivate() {
-        this.status = UserStatus.DEACTIVATE;
+    public void activate() {
+        this.status = UserStatus.ACTIVATE;
     }
+
 }
