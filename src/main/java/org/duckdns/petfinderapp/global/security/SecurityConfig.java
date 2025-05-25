@@ -43,7 +43,10 @@ public class SecurityConfig {
 			// 권한 검사 설정
 			.authorizeHttpRequests(auth -> auth
 				// 카카오 로그인 엔드포인트는 인증 없이 허용
-				.requestMatchers("/auth/login/kakao").permitAll()
+				.requestMatchers(
+					"/auth/login/kakao",
+					"/ws/**"
+				).permitAll()
 				// 그 외의 모든 요청은 인증 필요
 				.anyRequest().authenticated()
 			)
@@ -62,7 +65,7 @@ public class SecurityConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowedOriginPatterns(List.of("*"));
-		config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+		config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS", "WEBSOCKET"));
 		config.setAllowedHeaders(List.of("*"));
 		config.setAllowCredentials(true);
 
