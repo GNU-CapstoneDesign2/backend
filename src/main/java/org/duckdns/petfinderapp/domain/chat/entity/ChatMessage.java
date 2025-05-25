@@ -45,4 +45,14 @@ public class ChatMessage {
     /** 읽음 여부 */
     @Column(nullable = false)
     private Boolean read;
+
+	public static ChatMessage of(ChatRoom chatRoom, User sender, String message) {
+        return ChatMessage.builder()
+            .createAt(LocalDateTime.now())
+            .chatRoom(chatRoom)
+            .sender(sender)
+            .content(message)
+            .read(false) // 기본값은 읽지 않은 상태로 설정
+            .build();
+	}
 }
