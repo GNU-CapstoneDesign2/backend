@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
@@ -32,12 +34,14 @@ public class JwtTokenProvider {
 
 	// 1) 토큰 생성
 	public String createToken(String userId, List<String> roles) {
-		Map<String,Object> claims = Map.of("roles", roles);
+		Map<String, Object> claims = Map.of("roles", roles);
 
 		Date now = new Date();
 		Date exp = new Date(now.getTime() + validityInMilliseconds);
+		String jti = UUID.randomUUID().toString();
 
 		return Jwts.builder()
+			.id(jti)
 			.claims(claims)
 			.subject(userId)
 			.issuedAt(now)
@@ -46,8 +50,32 @@ public class JwtTokenProvider {
 			.compact();
 	}
 
-	public String createAccessToken(String  userId, List<String> roles) {
+	public String createAccessToken(String userId, List<String> roles) {
 		return createToken(userId, roles);
+	}
+
+	public Duration getExpiration(String token) {
+		Claims body = Jwts.parser()
+			.verifyWith(getSigningKey())
+			.build()
+			.parseSignedClaims(token)
+			.getPayload();
+
+		Date expiration = body.getExpiration();
+		if (expiration == null) {
+			return Duration.ZERO; // No expiration set
+		}
+		return Duration.between(new Date().toInstant(), expiration.toInstant());
+	}
+
+	public String getJti(String token) {
+		Claims body = Jwts.parser()
+			.verifyWith(getSigningKey())
+			.build()
+			.parseSignedClaims(token)
+			.getPayload();
+
+		return body.getId();
 	}
 
 	// 2) 토큰에서 사용자 ID 추출

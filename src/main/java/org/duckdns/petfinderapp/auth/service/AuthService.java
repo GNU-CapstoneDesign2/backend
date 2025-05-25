@@ -4,4 +4,5 @@ import org.duckdns.petfinderapp.auth.dto.LoginResponse;
 
 public interface AuthService {
 	LoginResponse kakaoLogin(String code);
+	void logout(String accessToken);
 }

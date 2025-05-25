@@ -3,6 +3,7 @@ package org.duckdns.petfinderapp.global.security;
 import java.io.IOException;
 
 import org.duckdns.petfinderapp.domain.user.entity.User;
+import org.duckdns.petfinderapp.domain.user.exception.UserNotFoundException;
 import org.duckdns.petfinderapp.domain.user.repository.UserRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final UserRepository userRepository;
+	private final TokenBlackListService blacklistService;
 
 	@Override
 	protected void doFilterInternal(
@@ -32,12 +34,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			String token = header.substring(7);
 
 			if (jwtTokenProvider.validateToken(token)) {
-				// 1) 토큰에서 사용자 ID 획득
+				// 1) 블랙리스트 체크
+				if(blacklistService.isBlackListed(jwtTokenProvider.getJti(token))) {
+					response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is blacklisted");
+					return;
+				}
+
+				// 2) 토큰에서 사용자 ID 획득
 				String userId = jwtTokenProvider.getUserId(token);
 
-				// 2) UserDetailsService 로부터 실제 사용자 정보 조회
+				// 3) UserDetailsService 로부터 실제 사용자 정보 조회
 				User user = userRepository.findByProviderId(userId)
-					.orElseThrow();
+					.orElseThrow(UserNotFoundException::missingUser);
 
 				// 4) principal 에 엔티티를, credentials 는 null, 권한 목록 세팅
 				UsernamePasswordAuthenticationToken auth =
