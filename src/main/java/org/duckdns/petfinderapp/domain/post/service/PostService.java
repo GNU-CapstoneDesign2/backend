@@ -6,6 +6,7 @@ import org.duckdns.petfinderapp.domain.post.dto.request.CommonUpdate;
 import org.duckdns.petfinderapp.domain.post.dto.response.ResCommon;
 import org.duckdns.petfinderapp.domain.post.entity.*;
 import org.duckdns.petfinderapp.domain.post.repository.PostRepository;
+import org.duckdns.petfinderapp.domain.user.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,8 +22,8 @@ public class PostService {
 
     // 게시글 작성
     @Transactional
-    public Long create(CommonCreate commonCreate, List<MultipartFile> image) {
-        Found common = commonCreate.toFound();
+    public Long create(CommonCreate commonCreate, List<MultipartFile> image, User user) {
+        Found common = commonCreate.toFound(user);
 
         if(image != null && !image.isEmpty()) {
             for(MultipartFile file : image) {
@@ -54,11 +55,16 @@ public class PostService {
 
     // found 게시글 수정
     @Transactional
-    public Long update(Long id, CommonUpdate dto, List<MultipartFile> image) {
+    public Long update(Long id, CommonUpdate dto, List<MultipartFile> image, User user) {
         PostCommon common = postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("해당 게시물이 존재하지 않습니다."));
         if (!(common instanceof Found found)) {
             throw new RuntimeException("해당 게시물은 FOUND 타입이 아닙니다.");
+        }
+
+        // 게시글 작성자와 현재 로그인한 사용자가 일치하는지 확인
+        if (!found.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("게시글 작성자만 수정할 수 있습니다.");
         }
         Coordinates updateCoordinates = dto.getCoordinates().toEntity();
 
@@ -90,12 +96,18 @@ public class PostService {
 
     // 게시글 삭제
     @Transactional
-    public void delete(Long id) {
+    public void delete(Long id, User user) {
         PostCommon common = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다."));
         if (!(common instanceof Found found)) {
             throw new IllegalArgumentException("해당 게시물은 FOUND 타입이 아닙니다.");
         }
+
+        // 게시글 작성자와 현재 로그인한 사용자가 일치하는지 확인
+        if (!found.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("게시글 작성자만 삭제할 수 있습니다.");
+        }
+
         postRepository.delete(found);
     }
 }

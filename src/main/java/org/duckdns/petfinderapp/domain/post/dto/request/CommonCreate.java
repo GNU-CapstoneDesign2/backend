@@ -7,6 +7,7 @@ import org.duckdns.petfinderapp.domain.post.entity.Found;
 import org.duckdns.petfinderapp.domain.post.entity.PostCommon;
 import org.duckdns.petfinderapp.domain.post.enums.PetType;
 import org.duckdns.petfinderapp.domain.post.enums.PostState;
+import org.duckdns.petfinderapp.domain.user.entity.User;
 
 import java.time.LocalDateTime;
 
@@ -35,11 +36,11 @@ public class CommonCreate {
                 .build();
     }
 
-    public Found toFound() {
+    public Found toFound(User user) {
         Coordinates coordEntity = coordinates.toEntity();
 
         return Found.builder()
-                .id(userId)
+                .user(user)
                 .state(state)
                 .date(date)
                 .address(address)
