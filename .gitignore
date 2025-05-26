@@ -39,3 +39,6 @@ out/
 ### application.yml ###
 application.yml
 application-dev.yml
+
+# Firebase 키 파일 무시
+firebase-service-account.json

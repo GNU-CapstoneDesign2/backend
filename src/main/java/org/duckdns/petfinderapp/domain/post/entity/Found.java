@@ -6,9 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@DiscriminatorValue("SIGHT")
+@DiscriminatorValue("FOUND")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder
-public class Sight extends PostCommon {
+public class Found extends PostCommon {
 }
 

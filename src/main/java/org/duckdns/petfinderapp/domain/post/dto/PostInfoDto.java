@@ -22,8 +22,8 @@ public record PostInfoDto (
 			.state(post.getState())
 			.date(post.getCreateAt())
 			.address(post.getAddress())
-			.description(post.getDescription())
-			.imageUrl(post.getImages().get(0).getImageUrl())
+			.description(post.getContent())
+			.imageUrl(post.getImages().get(0).getFilePath())
 			.build();
     }
 }
