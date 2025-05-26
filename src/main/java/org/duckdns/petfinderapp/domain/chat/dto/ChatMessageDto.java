@@ -15,7 +15,7 @@ public record ChatMessageDto(
 	Long senderId,
 	@NotBlank
 	String message,
-	LocalDateTime createdAt,
+	LocalDateTime createAt,
 	PostInfoDto post,
 	Boolean isRead
 ) {
@@ -23,7 +23,7 @@ public record ChatMessageDto(
 		return ChatMessageDto.builder()
 			.senderId(chatMessage.getSender().getId())
 			.message(chatMessage.getContent())
-			.createdAt(chatMessage.getCreateAt())
+			.createAt(chatMessage.getCreateAt())
 			.post(postInfoDto)
 			.isRead(chatMessage.getRead())
 			.build();
