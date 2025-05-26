@@ -8,6 +8,8 @@ import org.duckdns.petfinderapp.domain.post.enums.PostState;
 import org.duckdns.petfinderapp.domain.user.entity.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -59,4 +61,8 @@ public class PostCommon {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PostState state;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostImage> images = new ArrayList<>();
 }
