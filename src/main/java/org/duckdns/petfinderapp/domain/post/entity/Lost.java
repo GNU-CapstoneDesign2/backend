@@ -20,15 +20,24 @@ public class Lost extends PostCommon {
     @Enumerated(EnumType.STRING)
     private NeuterStatus neuter;
 
-    @Column(name = "animal_num", length = 50)
-    private String animalNum;
+    @Column(name = "pet_num", length = 50)
+    private String petNum;
 
     @Column(length = 50)
-    private String bread;
+    private String breed;
 
     @Column(length = 50)
     private String phone;
 
     private Integer reward;
+
+    public void update(String name, String gender, String petNum, String breed, String phone, Integer reward) {
+        this.name = name;
+        this.gender = gender;
+        this.petNum = petNum;
+        this.breed = breed;
+        this.phone = phone;
+        this.reward = reward;
+    }
 }
 
