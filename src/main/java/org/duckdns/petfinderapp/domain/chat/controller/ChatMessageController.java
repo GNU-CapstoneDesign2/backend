@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class ChatController {
+public class ChatMessageController {
 	private final ChatService chatService;
 
 	@Transactional
