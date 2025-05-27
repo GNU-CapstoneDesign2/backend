@@ -25,7 +25,7 @@ public record ChatMessageDto(
 			.message(chatMessage.getContent())
 			.createAt(chatMessage.getCreateAt())
 			.post(postInfoDto)
-			.isRead(chatMessage.getRead())
+			.isRead(chatMessage.getIsRead())
 			.build();
 	}
 }
