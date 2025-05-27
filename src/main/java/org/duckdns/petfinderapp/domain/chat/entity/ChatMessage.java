@@ -14,12 +14,7 @@ import java.time.LocalDateTime;
 public class ChatMessage {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chat_message_seq")
-    @SequenceGenerator(
-            name = "chat_message_seq",
-            sequenceName = "chat_message_seq",
-            allocationSize = 1
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "create_at",
@@ -44,7 +39,7 @@ public class ChatMessage {
 
     /** 읽음 여부 */
     @Column(nullable = false)
-    private Boolean read;
+    private Boolean isRead;
 
 	public static ChatMessage of(ChatRoom chatRoom, User sender, String message) {
         return ChatMessage.builder()
@@ -52,7 +47,7 @@ public class ChatMessage {
             .chatRoom(chatRoom)
             .sender(sender)
             .content(message)
-            .read(false) // 기본값은 읽지 않은 상태로 설정
+            .isRead(false) // 기본값은 읽지 않은 상태로 설정
             .build();
 	}
 }

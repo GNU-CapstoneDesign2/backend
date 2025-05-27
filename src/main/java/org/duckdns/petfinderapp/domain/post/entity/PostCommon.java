@@ -21,12 +21,7 @@ import java.util.List;
 public class PostCommon {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "post_common_seq")
-    @SequenceGenerator(
-            name = "post_common_seq",
-            sequenceName = "post_common_seq",
-            allocationSize = 1
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
