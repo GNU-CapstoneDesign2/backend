@@ -16,7 +16,7 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("status <> 'DEACTIVATE'")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
     private Long id;
 

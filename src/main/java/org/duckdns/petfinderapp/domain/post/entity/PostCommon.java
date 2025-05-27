@@ -21,7 +21,7 @@ import java.util.List;
 public class PostCommon {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "post_common_seq")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @SequenceGenerator(
             name = "post_common_seq",
             sequenceName = "post_common_seq",

@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class SearchHistory {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "search_history_seq")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @SequenceGenerator(
             name = "search_history_seq",
             sequenceName = "search_history_seq",
