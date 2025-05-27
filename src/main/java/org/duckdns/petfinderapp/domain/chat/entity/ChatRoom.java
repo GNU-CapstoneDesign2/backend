@@ -18,11 +18,6 @@ public class ChatRoom {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @SequenceGenerator(
-            name = "chat_room_seq",
-            sequenceName = "chat_room_seq",
-            allocationSize = 1
-    )
     private Long id;
 
     @Column(name = "create_at",

@@ -15,11 +15,6 @@ public class ChatMessage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @SequenceGenerator(
-            name = "chat_message_seq",
-            sequenceName = "chat_message_seq",
-            allocationSize = 1
-    )
     private Long id;
 
     @Column(name = "create_at",

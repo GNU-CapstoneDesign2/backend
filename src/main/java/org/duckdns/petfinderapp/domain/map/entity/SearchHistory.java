@@ -16,11 +16,6 @@ public class SearchHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @SequenceGenerator(
-            name = "search_history_seq",
-            sequenceName = "search_history_seq",
-            allocationSize = 1
-    )
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

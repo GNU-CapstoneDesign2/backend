@@ -22,11 +22,6 @@ public class PostCommon {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @SequenceGenerator(
-            name = "post_common_seq",
-            sequenceName = "post_common_seq",
-            allocationSize = 1
-    )
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

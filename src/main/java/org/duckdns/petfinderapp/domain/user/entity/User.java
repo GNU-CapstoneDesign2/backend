@@ -17,7 +17,6 @@ import org.hibernate.annotations.SQLRestriction;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
     private Long id;
 
     @Column(length = 50, nullable = false)
