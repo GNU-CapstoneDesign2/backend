@@ -1,13 +1,14 @@
 package org.duckdns.petfinderapp.auth.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.duckdns.petfinderapp.auth.config.KakaoProperties;
 import org.duckdns.petfinderapp.auth.dto.KakaoTokenResponse;
 import org.duckdns.petfinderapp.auth.dto.KakaoUserInfoResponse;
 import org.duckdns.petfinderapp.auth.dto.LoginResponse;
 import org.duckdns.petfinderapp.domain.user.entity.User;
-import org.duckdns.petfinderapp.domain.user.exception.UserNotFoundException;
+import org.duckdns.petfinderapp.domain.user.enums.UserStatus;
 import org.duckdns.petfinderapp.domain.user.repository.UserRepository;
 import org.duckdns.petfinderapp.global.security.JwtTokenProvider;
 import org.duckdns.petfinderapp.global.security.TokenBlackListService;
@@ -85,12 +86,17 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	private User registerNewUserIfNeeded(KakaoUserInfoResponse info) {
-		int updated = userRepository.activateByProviderId(info.getId());
-		if (updated > 0) {
-			// 방금 activate 한 유저 다시 조회 (이때는 @Where 가 걸리지만 이미 ACTIVATE 됐으니 OK)
-			return userRepository.findByProviderId(info.getId())
-				.orElseThrow(UserNotFoundException::missingUser);
+		Optional<User> any = userRepository.findByProviderIdIncludeDeactivated(info.getId());
+		if (any.isPresent()) {
+			User existing = any.get();
+
+			if (existing.getStatus() == UserStatus.DEACTIVATE) {
+				existing.activate();
+			}
+
+			return existing;
 		}
+
 		// 신규 가입
 		return userRepository.save(info.toUser());
 	}

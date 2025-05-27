@@ -18,4 +18,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 		nativeQuery = true
 	)
 	int activateByProviderId(String pid);
+
+	@Query(
+		value = "SELECT * FROM users WHERE provider_id = :id",
+		nativeQuery = true
+	)
+	Optional<User> findByProviderIdIncludeDeactivated(String id);
+
 }
