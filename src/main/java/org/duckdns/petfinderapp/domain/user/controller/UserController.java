@@ -52,4 +52,6 @@ public class UserController {
 		userService.deleteUser(user);
 		return ApiResponse.onSuccess(HttpStatus.NO_CONTENT, "회원 탈퇴 성공", null);
 	}
+
+	//테스트
 }
