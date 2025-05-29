@@ -7,28 +7,31 @@ import com.google.firebase.messaging.Notification;
 import lombok.RequiredArgsConstructor;
 import org.duckdns.petfinderapp.domain.push.entity.FcmToken;
 import org.duckdns.petfinderapp.domain.push.repository.FcmTokenRepository;
+import org.duckdns.petfinderapp.domain.user.entity.User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class FcmService {
     private final FcmTokenRepository fcmTokenRepository;
 
-    public void saveToken(Long userId, String token) {
-        FcmToken tokenEntity = fcmTokenRepository.findByUserId(userId)
+    @Transactional
+    public void saveToken(User user, String token) {
+        FcmToken tokenEntity = fcmTokenRepository.findByUserId(user)
                 .map(t -> {
                     t.updateToken(token);
                     return t;
                 })
-                .orElse(new FcmToken(userId, token));
+                .orElse(new FcmToken(user, token));
 
         fcmTokenRepository.save(tokenEntity);
     }
 
-    public void sendMessage(Long userId, String title, String message) {
-        String token = fcmTokenRepository.findByUserId(userId)
+    public void sendMessage(User user, String title, String message) {
+        String token = fcmTokenRepository.findByUserId(user)
                 .map(FcmToken::getToken)
-                .orElseThrow(() -> new IllegalArgumentException("토큰 없음"));
+                .orElseThrow(() -> new IllegalArgumentException("사용자 토큰을 찾을 수 없습니다."));
 
         Notification notification = Notification.builder()
                 .setTitle(title)
