@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class CommonCreate {
-    private Long userId;
     private PostState state;
     private LocalDateTime date;
     private String address;
@@ -26,7 +25,6 @@ public class CommonCreate {
         Coordinates coordEntity = coordinates.toEntity();
 
         return PostCommon.builder()
-                .id(userId)
                 .state(state)
                 .date(date)
                 .address(address)

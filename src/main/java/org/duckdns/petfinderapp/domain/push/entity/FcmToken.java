@@ -1,12 +1,10 @@
 package org.duckdns.petfinderapp.domain.push.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.duckdns.petfinderapp.domain.user.entity.User;
 
 import java.time.LocalDateTime;
 
@@ -19,13 +17,14 @@ public class FcmToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    private boolean read;
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
     private String token;
     private LocalDateTime updatedAt;
 
-    public FcmToken(Long userId, String token) {
-        this.userId = userId;
+    public FcmToken(User user, String token) {
+        this.user = user;
         this.token = token;
         this.updatedAt = LocalDateTime.now();
     }
