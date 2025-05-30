@@ -31,8 +31,7 @@ public class PostCommon {
 
     @Column(name = "create_at",
             nullable = false,
-            updatable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+            updatable = false)
     @CreationTimestamp
     private LocalDateTime createAt;
 
