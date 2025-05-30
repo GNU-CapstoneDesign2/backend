@@ -6,6 +6,7 @@ import lombok.experimental.SuperBuilder;
 import org.duckdns.petfinderapp.domain.post.enums.PetType;
 import org.duckdns.petfinderapp.domain.post.enums.PostState;
 import org.duckdns.petfinderapp.domain.user.entity.User;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,8 +31,8 @@ public class PostCommon {
 
     @Column(name = "create_at",
             nullable = false,
-            updatable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+            updatable = false)
+    @CreationTimestamp
     private LocalDateTime createAt;
 
     @Column(insertable = false, updatable = false)
