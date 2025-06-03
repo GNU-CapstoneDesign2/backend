@@ -99,15 +99,12 @@ public class PostService {
     public void delete(Long id, User user) {
         PostCommon common = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다."));
-        if (!(common instanceof Found found)) {
-            throw new IllegalArgumentException("해당 게시물은 FOUND 타입이 아닙니다.");
-        }
 
         // 게시글 작성자와 현재 로그인한 사용자가 일치하는지 확인
-        if (!found.getUser().getId().equals(user.getId())) {
+        if (!common.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("게시글 작성자만 삭제할 수 있습니다.");
         }
 
-        postRepository.delete(found);
+        postRepository.delete(common);
     }
 }
