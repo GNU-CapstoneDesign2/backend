@@ -23,7 +23,7 @@ public record PostInfoDto (
 			.date(post.getCreateAt())
 			.address(post.getAddress())
 			.description(post.getContent())
-			.imageUrl(post.getImages().get(0).getFilePath())
+			.imageUrl(post.getImages().get(0).getFileURL())
 			.build();
     }
 }

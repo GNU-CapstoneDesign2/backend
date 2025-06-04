@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,23 +20,32 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
-    private final FileService fileService;
+    private final S3Uploader s3Uploader;
 
     // 게시글 작성
     @Transactional
     public Long create(CommonCreate commonCreate, List<MultipartFile> image, User user) {
         Found common = commonCreate.toFound(user);
 
-        if(image != null && !image.isEmpty()) {
-            for(MultipartFile file : image) {
-                String filePath = fileService.saveFile(file);
-                Image img  = Image.builder()
-                        .origFileName(file.getOriginalFilename())
-                        .filePath(filePath)
-                        .fileSize(file.getSize())
-                        .build();
+        if (image != null && !image.isEmpty()) {
+            for (MultipartFile file : image) {
+                try {
+                    // S3에 업로드
+                    String imageUrl = s3Uploader.upload(file, "images");
 
-                common.addImage(img);
+                    // 이미지 Entity
+                    Image img = Image.builder()
+                            .origFileName(file.getOriginalFilename())
+                            .fileURL(imageUrl)  // S3 URL 저장
+                            .fileSize(file.getSize())
+                            .build();
+
+                    // 게시글에 이미지 추가
+                    common.addImage(img);
+
+                } catch (IOException e) {
+                    throw new RuntimeException("이미지 업로드 실패: " + file.getOriginalFilename(), e);
+                }
             }
         }
 
@@ -76,19 +87,31 @@ public class PostService {
                 );
 
         if (image != null && !image.isEmpty()) {
-            List<Image> img = image.stream()
-                    .map(file -> {
-                        String imageUrl = fileService.upload(file);
-                        return Image.builder()
-                                .origFileName(file.getOriginalFilename())
-                                .filePath(imageUrl)
-                                .fileSize(file.getSize())
-                                .common(found)
-                                .build();
-                    })
-                    .collect(Collectors.toList());
+            // 기존 이미지 S3에서 삭제
+            List<Image> existingImages = new ArrayList<>(common.getImages());
+            for (Image img : existingImages) {
+                s3Uploader.delete(img.getFileURL());
+            }
 
-            found.updateImage(img);
+            // 새 이미지 목록 생성
+            List<Image> newImages = new ArrayList<>();
+            for (MultipartFile file : image) {
+                try {
+                    String imageUrl = s3Uploader.upload(file, "images");
+
+                    Image img = Image.builder()
+                            .origFileName(file.getOriginalFilename())
+                            .fileURL(imageUrl)
+                            .fileSize(file.getSize())
+                            .build();
+
+                    newImages.add(img);
+                } catch (IOException e) {
+                    throw new RuntimeException("이미지 업로드 실패: " + file.getOriginalFilename(), e);
+                }
+            }
+
+            common.updateImage(newImages);
         }
 
         return id;

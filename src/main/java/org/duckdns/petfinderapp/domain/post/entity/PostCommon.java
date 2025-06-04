@@ -70,10 +70,17 @@ public class PostCommon {
         this.coordinates = coordinates;
     }
 
+    public void clearImages() {
+        for (Image image : this.images) {
+            image.setCommon(null);
+        }
+        this.images.clear(); // 리스트 비우기
+    }
+
     public void updateImage(List<Image> newimg) {
-        this.images.clear();
-        for(Image image : newimg){
-            this.images.add(image);
+        clearImages(); // 기존 이미지 관계 제거
+        for (Image image : newimg) {
+            addImage(image);
         }
     }
 
