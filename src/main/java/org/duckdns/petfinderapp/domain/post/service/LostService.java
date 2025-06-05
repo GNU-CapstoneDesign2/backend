@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,7 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LostService {
     private final LostRepository lostRepository;
-    private final FileService fileService;
+    private final S3Uploader s3Uploader;
 
     // 게시글 작성
     @Transactional
@@ -47,13 +49,23 @@ public class LostService {
 
         if (image != null && !image.isEmpty()) {
             for (MultipartFile file : image) {
-                String filePath = fileService.saveFile(file);
-                Image img = Image.builder()
-                        .origFileName(file.getOriginalFilename())
-                        .filePath(filePath)
-                        .fileSize(file.getSize())
-                        .build();
-                lost.addImage(img);
+                try {
+                    // S3에 업로드
+                    String imageUrl = s3Uploader.upload(file, "images");
+
+                    // 이미지 Entity
+                    Image img = Image.builder()
+                            .origFileName(file.getOriginalFilename())
+                            .fileURL(imageUrl)  // S3 URL 저장
+                            .fileSize(file.getSize())
+                            .build();
+
+                    // 게시글에 이미지 추가
+                    lost.addImage(img);
+
+                } catch (IOException e) {
+                    throw new RuntimeException("이미지 업로드 실패: " + file.getOriginalFilename(), e);
+                }
             }
         }
 
@@ -99,20 +111,31 @@ public class LostService {
 
 
         if (image != null && !image.isEmpty()) {
-            lost.getImages().clear();
+            // 기존 이미지 S3에서 삭제
+            List<Image> existingImages = new ArrayList<>(lost.getImages());
+            for (Image img : existingImages) {
+                s3Uploader.delete(img.getFileURL());
+            }
 
-            List<Image> img = image.stream()
-                    .map(file -> {
-                        String imageUrl = fileService.upload(file);
-                        return Image.builder()
-                                .origFileName(file.getOriginalFilename())
-                                .filePath(imageUrl)
-                                .fileSize(file.getSize())
-                                .build();
-                    })
-                    .collect(Collectors.toList());
+            // 새 이미지 목록 생성
+            List<Image> newImages = new ArrayList<>();
+            for (MultipartFile file : image) {
+                try {
+                    String imageUrl = s3Uploader.upload(file, "images");
 
-            lost.updateImage(img);
+                    Image img = Image.builder()
+                            .origFileName(file.getOriginalFilename())
+                            .fileURL(imageUrl)
+                            .fileSize(file.getSize())
+                            .build();
+
+                    newImages.add(img);
+                } catch (IOException e) {
+                    throw new RuntimeException("이미지 업로드 실패: " + file.getOriginalFilename(), e);
+                }
+            }
+
+            lost.updateImage(newImages);
         }
 
         return id;

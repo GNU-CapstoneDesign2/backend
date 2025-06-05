@@ -18,7 +18,7 @@ public class Image {
     private PostCommon common;
 
     private String origFileName;
-    private String filePath;
+    private String fileURL;
     private Long fileSize;
 
     public void setCommon(PostCommon common) {

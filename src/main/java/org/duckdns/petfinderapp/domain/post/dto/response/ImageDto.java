@@ -7,9 +7,9 @@ import org.duckdns.petfinderapp.domain.post.entity.Image;
 @Getter
 @AllArgsConstructor
 public class ImageDto {
-    private String filePath;
+    private String fileURL;
 
     public ImageDto(Image image) {
-        this.filePath = image.getFilePath();
+        this.fileURL = image.getFileURL();
     }
 }
