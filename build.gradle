@@ -27,6 +27,8 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	testImplementation 'io.projectreactor:reactor-test'
 	runtimeOnly     'io.jsonwebtoken:jjwt-impl:0.12.6'
 	runtimeOnly     'io.jsonwebtoken:jjwt-jackson:0.12.6'
 	testImplementation 'org.springframework.security:spring-security-test'
@@ -42,6 +44,7 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.0'
 }
 
 tasks.named('test') {
