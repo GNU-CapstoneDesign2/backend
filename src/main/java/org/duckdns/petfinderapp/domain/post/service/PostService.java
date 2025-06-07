@@ -1,10 +1,20 @@
 package org.duckdns.petfinderapp.domain.post.service;
 
-import lombok.RequiredArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.duckdns.petfinderapp.domain.post.dto.request.CommonCreate;
 import org.duckdns.petfinderapp.domain.post.dto.request.CommonUpdate;
 import org.duckdns.petfinderapp.domain.post.dto.response.ResCommon;
-import org.duckdns.petfinderapp.domain.post.entity.*;
+import org.duckdns.petfinderapp.domain.post.entity.Adopt;
+import org.duckdns.petfinderapp.domain.post.entity.Coordinates;
+import org.duckdns.petfinderapp.domain.post.entity.Found;
+import org.duckdns.petfinderapp.domain.post.entity.Image;
+import org.duckdns.petfinderapp.domain.post.entity.PostCommon;
+import org.duckdns.petfinderapp.domain.post.repository.AdoptRepository;
 import org.duckdns.petfinderapp.domain.post.repository.PostRepository;
 import org.duckdns.petfinderapp.domain.user.entity.User;
 import org.springframework.stereotype.Service;
@@ -12,14 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+	private final AdoptRepository adoptRepository;
     private final S3Uploader s3Uploader;
 
     // 게시글 작성
@@ -130,4 +139,31 @@ public class PostService {
 
         postRepository.delete(common);
     }
+
+    @Transactional
+    public Integer upsertAdopts(List<Adopt> newAdoptList) {
+        List<String> newAnimalNums = newAdoptList.stream()
+            .map(Adopt::getAnimalNum)
+            .toList();
+
+        List<Adopt> existingAdopts = adoptRepository.findAllByAnimalNumIn(newAnimalNums);
+
+        Map<String, Adopt> existingMap = existingAdopts.stream()
+            .collect(Collectors.toMap(Adopt::getAnimalNum, Function.identity()));
+
+        List<Adopt> newAdopts = new ArrayList<>();
+
+        for (Adopt newAdopt : newAdoptList) {
+            Adopt existingAdopt = existingMap.get(newAdopt.getAnimalNum());
+            if (existingAdopt != null) {
+                existingAdopt.updateWith(newAdopt);
+            } else {
+                newAdopts.add(newAdopt);
+            }
+        }
+
+        adoptRepository.saveAll(newAdopts);
+        return newAdopts.size();
+    }
+
 }
