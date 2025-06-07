@@ -1,16 +1,37 @@
 package org.duckdns.petfinderapp.domain.post.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.duckdns.petfinderapp.domain.post.enums.PetType;
 import org.duckdns.petfinderapp.domain.post.enums.PostState;
 import org.duckdns.petfinderapp.domain.user.entity.User;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.DiscriminatorType;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -26,7 +47,7 @@ public class PostCommon {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+	@JoinColumn(name = "user_id", nullable = true)
     private User user;
 
     @Column(name = "create_at",
@@ -60,7 +81,8 @@ public class PostCommon {
     private PostState state;
 
     @Builder.Default
-    @OneToMany(mappedBy = "common", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+	@OneToMany(mappedBy = "common", cascade = {CascadeType.PERSIST,
+		CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Image> images = new ArrayList<>();
 
     public void update(String address, PetType petType, String content, Coordinates coordinates) {
@@ -69,6 +91,16 @@ public class PostCommon {
         this.content = content;
         this.coordinates = coordinates;
     }
+
+	public void update(LocalDateTime data, String address, Coordinates coordinates, PetType petType, String content,
+		PostState state) {
+		this.date = data;
+		this.address = address;
+		this.coordinates = coordinates;
+		this.petType = petType;
+		this.content = content;
+		this.state = state;
+	}
 
     public void clearImages() {
         for (Image image : this.images) {
@@ -87,7 +119,7 @@ public class PostCommon {
     public void addImage(Image image) {
         this.images.add(image);
 
-        if(image.getCommon() != this)
+		if (image.getCommon() != this)
             image.setCommon(this);
     }
 }
