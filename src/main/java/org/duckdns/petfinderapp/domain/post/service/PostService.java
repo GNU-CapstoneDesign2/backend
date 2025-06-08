@@ -142,11 +142,11 @@ public class PostService {
 
     @Transactional
     public Integer upsertAdopts(List<Adopt> newAdoptList) {
-        List<String> newDesertionNum = newAdoptList.stream()
+        List<String> newDesertionNumList = newAdoptList.stream()
             .map(Adopt::getDesertionNum)
             .toList();
 
-        List<Adopt> existingAdopts = adoptRepository.findAllByDesertionNumIn(newDesertionNum);
+        List<Adopt> existingAdopts = adoptRepository.findAllByDesertionNumIn(newDesertionNumList);
 
         Map<String, Adopt> existingMap = existingAdopts.stream()
             .collect(Collectors.toMap(Adopt::getDesertionNum, Function.identity()));
