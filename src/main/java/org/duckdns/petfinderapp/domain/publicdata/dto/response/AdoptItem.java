@@ -82,7 +82,7 @@ public record AdoptItem(
 	public Adopt toAdopt(Coordinates coordinates) {
 		Adopt adopt = Adopt.builder()
 			.desertionNum(desertionNo)
-			.animalNum(rfidCd)
+			.petNum(rfidCd)
 			.age(age)
 			.color(colorCd)
 			.gender(sexCd)
@@ -110,7 +110,8 @@ public record AdoptItem(
 
 	public Adopt toAdopt(PostState postState, Coordinates coordinates) {
 		Adopt adopt = Adopt.builder()
-			.animalNum(desertionNo)
+			.desertionNum(desertionNo)
+			.petNum(rfidCd)
 			.age(age)
 			.color(colorCd)
 			.gender(sexCd)

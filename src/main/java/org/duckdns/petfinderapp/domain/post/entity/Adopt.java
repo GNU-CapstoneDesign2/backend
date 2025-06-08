@@ -25,8 +25,8 @@ public class Adopt extends PostCommon {
     @Column(name = "desertion_no", nullable = false, length = 50, unique = true)
     private String desertionNum; // 구조번호
 
-    @Column(name = "animal_num", length = 50)
-    private String animalNum;
+    @Column(name = "pet_num", length = 50)
+    private String petNum;
 
     private String age;
     private String color;
@@ -61,7 +61,7 @@ public class Adopt extends PostCommon {
         );
 
         this.desertionNum = adopt.getDesertionNum();
-        this.animalNum = adopt.getAnimalNum();
+        this.petNum = adopt.getPetNum();
         this.age = adopt.getAge();
         this.color = adopt.getColor();
         this.gender = adopt.getGender();
