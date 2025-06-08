@@ -25,6 +25,9 @@ import lombok.Builder;
 public record AdoptItem(
 	@NotBlank
 	String desertionNo,   // 구조번호
+
+	String rfidCd, // 동물등록번호(RFID 코드, 예: 123456789012345)
+
 	@NotBlank
 	String age,           // 나이 (예: 2025(60일미만)(년생))
 	@NotBlank
@@ -78,7 +81,8 @@ public record AdoptItem(
 
 	public Adopt toAdopt(Coordinates coordinates) {
 		Adopt adopt = Adopt.builder()
-			.animalNum(desertionNo)
+			.desertionNum(desertionNo)
+			.animalNum(rfidCd)
 			.age(age)
 			.color(colorCd)
 			.gender(sexCd)

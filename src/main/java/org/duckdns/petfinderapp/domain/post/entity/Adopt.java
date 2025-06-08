@@ -22,6 +22,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class Adopt extends PostCommon {
 
+    @Column(name = "desertion_no", nullable = false, length = 50, unique = true)
+    private String desertionNum; // 구조번호
+
     @Column(name = "animal_num", length = 50)
     private String animalNum;
 
@@ -57,6 +60,7 @@ public class Adopt extends PostCommon {
             adopt.getState()
         );
 
+        this.desertionNum = adopt.getDesertionNum();
         this.animalNum = adopt.getAnimalNum();
         this.age = adopt.getAge();
         this.color = adopt.getColor();

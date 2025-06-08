@@ -142,19 +142,19 @@ public class PostService {
 
     @Transactional
     public Integer upsertAdopts(List<Adopt> newAdoptList) {
-        List<String> newAnimalNums = newAdoptList.stream()
-            .map(Adopt::getAnimalNum)
+        List<String> newDesertionNum = newAdoptList.stream()
+            .map(Adopt::getDesertionNum)
             .toList();
 
-        List<Adopt> existingAdopts = adoptRepository.findAllByAnimalNumIn(newAnimalNums);
+        List<Adopt> existingAdopts = adoptRepository.findAllByDesertionNumIn(newDesertionNum);
 
         Map<String, Adopt> existingMap = existingAdopts.stream()
-            .collect(Collectors.toMap(Adopt::getAnimalNum, Function.identity()));
+            .collect(Collectors.toMap(Adopt::getDesertionNum, Function.identity()));
 
         List<Adopt> newAdopts = new ArrayList<>();
 
         for (Adopt newAdopt : newAdoptList) {
-            Adopt existingAdopt = existingMap.get(newAdopt.getAnimalNum());
+            Adopt existingAdopt = existingMap.get(newAdopt.getDesertionNum());
             if (existingAdopt != null) {
                 existingAdopt.updateWith(newAdopt);
             } else {
