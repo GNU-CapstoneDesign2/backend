@@ -1,5 +1,6 @@
 package org.duckdns.petfinderapp.domain.map.controller;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.duckdns.petfinderapp.domain.map.dto.response.MapSearchResponse;
 import org.duckdns.petfinderapp.domain.map.service.MapService;
@@ -26,6 +27,7 @@ public class MapController {
   @GetMapping("/search")
   public ApiResponse<Page<MapSearchResponse>> mapSearch(
       @Size(min = 15, max = 15, message = "동물등록번호는 15자리입니다.")
+      @NotBlank
       @RequestParam String query,
       Pageable pageable) {
     Page<MapSearchResponse> data = mapService.mapSearch(query, pageable);

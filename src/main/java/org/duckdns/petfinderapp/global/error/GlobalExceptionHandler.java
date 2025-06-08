@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -21,6 +22,25 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+  @ExceptionHandler(MissingServletRequestParameterException.class)
+  public ResponseEntity<ApiResponse<Map<String, String>>> handleMissingParam(
+      MissingServletRequestParameterException ex) {
+
+    Map<String, String> errors = Map.of(
+        ex.getParameterName(),
+        "필수 요청 파라미터 '" + ex.getParameterName() + "'가 누락되었습니다."
+    );
+
+    ApiResponse<Map<String, String>> body =
+        ApiResponse.onFailure(HttpStatus.BAD_REQUEST,
+            "필수 요청 파라미터가 누락되었습니다",
+            errors);
+
+    return ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .body(body);
+  }
 
   @ExceptionHandler(ConstraintViolationException.class)
   public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationException(
