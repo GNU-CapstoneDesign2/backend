@@ -1,6 +1,8 @@
 package org.duckdns.petfinderapp.domain.map.service;
 
+import org.duckdns.petfinderapp.domain.map.dto.request.MapMarkerRequest;
 import org.duckdns.petfinderapp.domain.map.dto.request.MapPostRequest;
+import org.duckdns.petfinderapp.domain.map.dto.response.MapMarkerResponse;
 import org.duckdns.petfinderapp.domain.map.dto.response.MapPostsResponse;
 import org.duckdns.petfinderapp.domain.map.dto.response.MapSearchResponse;
 import org.springframework.data.domain.Page;
@@ -13,4 +15,6 @@ public interface MapService {
   Page<MapPostsResponse> getPostsByCoordinates(
       MapPostRequest mapPostRequest,
       Pageable pageable);
+
+  MapMarkerResponse getMarkersByCoordinates(MapMarkerRequest mapMarkerRequest);
 }

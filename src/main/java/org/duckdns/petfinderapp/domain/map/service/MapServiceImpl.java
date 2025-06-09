@@ -1,7 +1,11 @@
 package org.duckdns.petfinderapp.domain.map.service;
 
 import jakarta.persistence.criteria.Predicate;
+import java.util.List;
+import org.duckdns.petfinderapp.domain.map.dto.item.MarkerItem;
+import org.duckdns.petfinderapp.domain.map.dto.request.MapMarkerRequest;
 import org.duckdns.petfinderapp.domain.map.dto.request.MapPostRequest;
+import org.duckdns.petfinderapp.domain.map.dto.response.MapMarkerResponse;
 import org.duckdns.petfinderapp.domain.map.dto.response.MapPostsResponse;
 import org.duckdns.petfinderapp.domain.map.dto.response.MapSearchResponse;
 import org.duckdns.petfinderapp.domain.post.entity.PostCommon;
@@ -54,5 +58,35 @@ public class MapServiceImpl implements MapService {
 
     return postRepository.findAll(spec, pageable)
         .map(postCommon -> MapPostsResponse.of(postCommon, postCommon.getImages().get(0).getFileURL()));
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public MapMarkerResponse getMarkersByCoordinates(MapMarkerRequest mapMarkerRequest) {
+
+    // 1) states 또는 species 가 null 이거나 비어있으면 -> 결과 없음
+    if (mapMarkerRequest.states() == null || mapMarkerRequest.states().isEmpty()
+        || mapMarkerRequest.species() == null || mapMarkerRequest.species().isEmpty()) {
+      return MapMarkerResponse.empty();
+    }
+
+    Specification<PostCommon> spec = ((root, query, criteriaBuilder) -> {
+      Predicate latBetween = criteriaBuilder.between(
+          root.get("coordinates").get("latitude"), mapMarkerRequest.minLat(), mapMarkerRequest.maxLat());
+      Predicate lngBetween = criteriaBuilder.between(
+          root.get("coordinates").get("longitude"), mapMarkerRequest.minLng(), mapMarkerRequest.maxLng());
+      Predicate stateIn = root.get("state").in(mapMarkerRequest.states());
+      Predicate speciesIn = root.get("petType").in(mapMarkerRequest.species());
+      Predicate notEndPost = criteriaBuilder.notEqual(
+          root.get("state"), PostState.END);
+
+      return criteriaBuilder.and(latBetween, lngBetween, stateIn, speciesIn, notEndPost);
+    });
+
+    List<MarkerItem> markerItemList = postRepository.findAll(spec).stream()
+        .map(postCommon -> MarkerItem.of(postCommon, postCommon.getImages().get(0).getFileURL()))
+        .toList();
+
+    return MapMarkerResponse.from(markerItemList);
   }
 }
