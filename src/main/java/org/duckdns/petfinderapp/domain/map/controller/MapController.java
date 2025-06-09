@@ -3,9 +3,11 @@ package org.duckdns.petfinderapp.domain.map.controller;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.duckdns.petfinderapp.domain.map.dto.request.MapMarkerRequest;
 import org.duckdns.petfinderapp.domain.map.dto.request.MapPostRequest;
 import org.duckdns.petfinderapp.domain.map.dto.response.MapPostsResponse;
 import org.duckdns.petfinderapp.domain.map.dto.response.MapSearchResponse;
+import org.duckdns.petfinderapp.domain.map.dto.response.MapMarkerResponse;
 import org.duckdns.petfinderapp.domain.map.service.MapService;
 import org.duckdns.petfinderapp.global.template.ApiResponse;
 import org.springframework.data.domain.Page;
@@ -45,5 +47,13 @@ public class MapController {
         mapPostRequest, pageable);
 
     return ApiResponse.onSuccess(HttpStatus.OK, "게시글 조회 성공", data);
+  }
+
+  @GetMapping("/markers")
+  public ApiResponse<MapMarkerResponse> getMarkersByCoordinates(@Valid MapMarkerRequest mapMarkerRequest) {
+    MapMarkerResponse data = mapService.getMarkersByCoordinates(
+        mapMarkerRequest);
+
+    return ApiResponse.onSuccess(HttpStatus.OK, "마커 조회 성공", data);
   }
 }
