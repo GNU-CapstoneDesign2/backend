@@ -6,7 +6,7 @@ import org.duckdns.petfinderapp.domain.map.dto.item.MarkerItem;
 import org.duckdns.petfinderapp.domain.map.dto.request.MapMarkerRequest;
 import org.duckdns.petfinderapp.domain.map.dto.request.MapPostRequest;
 import org.duckdns.petfinderapp.domain.map.dto.response.MapMarkerResponse;
-import org.duckdns.petfinderapp.domain.map.dto.response.MapPostsResponse;
+import org.duckdns.petfinderapp.domain.post.dto.response.PostSummaryResponse;
 import org.duckdns.petfinderapp.domain.map.dto.response.MapSearchResponse;
 import org.duckdns.petfinderapp.domain.post.entity.PostCommon;
 import org.duckdns.petfinderapp.domain.post.enums.PostState;
@@ -33,7 +33,7 @@ public class MapServiceImpl implements MapService {
 
   @Override
   @Transactional(readOnly = true)
-  public Page<MapPostsResponse> getPostsByCoordinates(
+  public Page<PostSummaryResponse> getPostsByCoordinates(
       MapPostRequest mapPostRequest,
       Pageable pageable) {
 
@@ -45,9 +45,11 @@ public class MapServiceImpl implements MapService {
 
     Specification<PostCommon> spec = ((root, query, criteriaBuilder) -> {
       Predicate latBetween = criteriaBuilder.between(
-          root.get("coordinates").get("latitude"), mapPostRequest.minLat(), mapPostRequest.maxLat());
+          root.get("coordinates").get("latitude"), mapPostRequest.minLat(),
+          mapPostRequest.maxLat());
       Predicate lngBetween = criteriaBuilder.between(
-          root.get("coordinates").get("longitude"), mapPostRequest.minLng(), mapPostRequest.maxLng());
+          root.get("coordinates").get("longitude"), mapPostRequest.minLng(),
+          mapPostRequest.maxLng());
       Predicate stateIn = root.get("state").in(mapPostRequest.states());
       Predicate speciesIn = root.get("petType").in(mapPostRequest.species());
       Predicate notEndPost = criteriaBuilder.notEqual(
@@ -57,7 +59,7 @@ public class MapServiceImpl implements MapService {
     });
 
     return postRepository.findAll(spec, pageable)
-        .map(postCommon -> MapPostsResponse.of(postCommon, postCommon.getImages().get(0).getFileURL()));
+        .map(PostSummaryResponse::of);
   }
 
   @Override
@@ -72,9 +74,11 @@ public class MapServiceImpl implements MapService {
 
     Specification<PostCommon> spec = ((root, query, criteriaBuilder) -> {
       Predicate latBetween = criteriaBuilder.between(
-          root.get("coordinates").get("latitude"), mapMarkerRequest.minLat(), mapMarkerRequest.maxLat());
+          root.get("coordinates").get("latitude"), mapMarkerRequest.minLat(),
+          mapMarkerRequest.maxLat());
       Predicate lngBetween = criteriaBuilder.between(
-          root.get("coordinates").get("longitude"), mapMarkerRequest.minLng(), mapMarkerRequest.maxLng());
+          root.get("coordinates").get("longitude"), mapMarkerRequest.minLng(),
+          mapMarkerRequest.maxLng());
       Predicate stateIn = root.get("state").in(mapMarkerRequest.states());
       Predicate speciesIn = root.get("petType").in(mapMarkerRequest.species());
       Predicate notEndPost = criteriaBuilder.notEqual(
