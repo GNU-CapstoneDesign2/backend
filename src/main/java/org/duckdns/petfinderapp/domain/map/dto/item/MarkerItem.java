@@ -11,7 +11,7 @@ public record MarkerItem (
     Long postId,
     String address,
     PostState state,
-    PetType species,
+    PetType petType,
     Coordinates coordinate,
     String imageUrl
 ){
@@ -21,7 +21,7 @@ public record MarkerItem (
         .postId(postCommon.getId())
         .address(postCommon.getAddress())
         .state(postCommon.getState())
-        .species(postCommon.getPetType())
+        .petType(postCommon.getPetType())
         .coordinate(postCommon.getCoordinates())
         .imageUrl(fileURL)
         .build();
