@@ -53,7 +53,7 @@ public record AdoptItem(
 	@NotBlank
 	String happenPlace,   // 발견장소
 	@NotNull
-	PetType upKindNm,      // 축종명 (예: 고양이)
+	String upKindNm,      // 축종명 (예: 고양이)
 	@NotBlank
 	String specialMark,   // 특징
 	String popfile1,      // 이미지1 URL
@@ -79,6 +79,15 @@ public record AdoptItem(
 		return LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyyMMdd")).atStartOfDay();
 	}
 
+	private static PetType parsePetType(String upKindNm) {
+		return switch (upKindNm) {
+			case "개" -> PetType.DOG;
+			case "고양이" -> PetType.CAT;
+			case "기타" -> PetType.ETC;
+			default -> throw new IllegalArgumentException("알 수 없는 축종명: " + upKindNm);
+		};
+	}
+
 	public Adopt toAdopt(Coordinates coordinates) {
 		Adopt adopt = Adopt.builder()
 			.desertionNum(desertionNo)
@@ -95,7 +104,7 @@ public record AdoptItem(
 			.date(happenDt != null ? parseToLocalDateTime(happenDt) : null)
 			.address(happenPlace)
 			.coordinates(coordinates) // 좌표 정보는 API 응답에 포함되지 않음
-			.petType(upKindNm) // 축종명은 PetType으로 변환 필요
+			.petType(parsePetType(upKindNm)) // 축종명은 PetType으로 변환 필요
 			.content(specialMark)
 			.state(parseToLocalDateTime(noticeEdt).isAfter(LocalDateTime.now())
 				? PostState.NOTICE : PostState.ADOPT) // 상태 정보는 API 응답에 포함되지 않음
@@ -124,7 +133,7 @@ public record AdoptItem(
 			.date(happenDt != null ? parseToLocalDateTime(happenDt) : null)
 			.address(happenPlace)
 			.coordinates(coordinates) // 좌표 정보는 API 응답에 포함되지 않음
-			.petType(upKindNm) // 축종명은 PetType으로 변환 필요
+			.petType(parsePetType(upKindNm)) // 축종명은 PetType으로 변환 필요
 			.content(specialMark)
 			.state(postState) // 상태 정보는 API 응답에 포함되지 않음
 			.build();
