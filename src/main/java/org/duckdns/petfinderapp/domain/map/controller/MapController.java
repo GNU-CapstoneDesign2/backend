@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.duckdns.petfinderapp.domain.map.dto.request.MapMarkerRequest;
 import org.duckdns.petfinderapp.domain.map.dto.request.MapPostRequest;
-import org.duckdns.petfinderapp.domain.map.dto.response.MapPostsResponse;
+import org.duckdns.petfinderapp.domain.post.dto.response.PostSummaryResponse;
 import org.duckdns.petfinderapp.domain.map.dto.response.MapSearchResponse;
 import org.duckdns.petfinderapp.domain.map.dto.response.MapMarkerResponse;
 import org.duckdns.petfinderapp.domain.map.service.MapService;
@@ -40,10 +40,10 @@ public class MapController {
   }
 
   @GetMapping("/posts")
-  public ApiResponse<Page<MapPostsResponse>> getPostsByCoordinates(
+  public ApiResponse<Page<PostSummaryResponse>> getPostsByCoordinates(
       @Valid MapPostRequest mapPostRequest,
       Pageable pageable) {
-    Page<MapPostsResponse> data = mapService.getPostsByCoordinates(
+    Page<PostSummaryResponse> data = mapService.getPostsByCoordinates(
         mapPostRequest, pageable);
 
     return ApiResponse.onSuccess(HttpStatus.OK, "게시글 조회 성공", data);
