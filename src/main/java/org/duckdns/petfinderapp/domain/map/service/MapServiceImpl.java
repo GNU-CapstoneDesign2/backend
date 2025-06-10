@@ -37,9 +37,9 @@ public class MapServiceImpl implements MapService {
       MapPostRequest mapPostRequest,
       Pageable pageable) {
 
-    // 1) states 또는 species 가 null 이거나 비어있으면 -> 결과 없음
+    // 1) states 또는 petTypes 가 null 이거나 비어있으면 -> 결과 없음
     if (mapPostRequest.states() == null || mapPostRequest.states().isEmpty()
-        || mapPostRequest.species() == null || mapPostRequest.species().isEmpty()) {
+        || mapPostRequest.petTypes() == null || mapPostRequest.petTypes().isEmpty()) {
       return Page.empty(pageable);
     }
 
@@ -51,11 +51,11 @@ public class MapServiceImpl implements MapService {
           root.get("coordinates").get("longitude"), mapPostRequest.minLng(),
           mapPostRequest.maxLng());
       Predicate stateIn = root.get("state").in(mapPostRequest.states());
-      Predicate speciesIn = root.get("petType").in(mapPostRequest.species());
+      Predicate petTypesIn = root.get("petType").in(mapPostRequest.petTypes());
       Predicate notEndPost = criteriaBuilder.notEqual(
           root.get("state"), PostState.END);
 
-      return criteriaBuilder.and(latBetween, lngBetween, stateIn, speciesIn, notEndPost);
+      return criteriaBuilder.and(latBetween, lngBetween, stateIn, petTypesIn, notEndPost);
     });
 
     return postRepository.findAll(spec, pageable)
@@ -66,9 +66,9 @@ public class MapServiceImpl implements MapService {
   @Transactional(readOnly = true)
   public MapMarkerResponse getMarkersByCoordinates(MapMarkerRequest mapMarkerRequest) {
 
-    // 1) states 또는 species 가 null 이거나 비어있으면 -> 결과 없음
+    // 1) states 또는 petTypes 가 null 이거나 비어있으면 -> 결과 없음
     if (mapMarkerRequest.states() == null || mapMarkerRequest.states().isEmpty()
-        || mapMarkerRequest.species() == null || mapMarkerRequest.species().isEmpty()) {
+        || mapMarkerRequest.petTypes() == null || mapMarkerRequest.petTypes().isEmpty()) {
       return MapMarkerResponse.empty();
     }
 
@@ -80,11 +80,11 @@ public class MapServiceImpl implements MapService {
           root.get("coordinates").get("longitude"), mapMarkerRequest.minLng(),
           mapMarkerRequest.maxLng());
       Predicate stateIn = root.get("state").in(mapMarkerRequest.states());
-      Predicate speciesIn = root.get("petType").in(mapMarkerRequest.species());
+      Predicate petTypesIn = root.get("petType").in(mapMarkerRequest.petTypes());
       Predicate notEndPost = criteriaBuilder.notEqual(
           root.get("state"), PostState.END);
 
-      return criteriaBuilder.and(latBetween, lngBetween, stateIn, speciesIn, notEndPost);
+      return criteriaBuilder.and(latBetween, lngBetween, stateIn, petTypesIn, notEndPost);
     });
 
     List<MarkerItem> markerItemList = postRepository.findAll(spec).stream()

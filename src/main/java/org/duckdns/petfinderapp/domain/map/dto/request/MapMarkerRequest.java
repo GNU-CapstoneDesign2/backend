@@ -12,7 +12,7 @@ public record MapMarkerRequest(
     @RequestParam double minLng,
     @RequestParam double maxLng,
     @RequestParam(required = false) List<PostState> states,
-    @RequestParam(required = false) List<PetType> species
+    @RequestParam(required = false) List<PetType> petTypes
 ){
   @AssertTrue(message = "coordinate가 유효하지 않습니다")
   public boolean isValidCoordinates() {
