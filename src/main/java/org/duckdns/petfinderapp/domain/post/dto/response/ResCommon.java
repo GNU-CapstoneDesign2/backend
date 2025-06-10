@@ -27,7 +27,7 @@ public class ResCommon {
     public static ResCommon of(PostCommon Entity) {
         return ResCommon.builder()
                 .id(Entity.getId())
-                .userId(Entity.getUser().getId())
+                .userId(Entity.getUser() != null ? Entity.getUser().getId() : null)
                 .state(Entity.getState())
                 .createdAt(Entity.getCreateAt())
                 .date(Entity.getDate())
