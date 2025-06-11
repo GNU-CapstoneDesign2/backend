@@ -71,5 +71,6 @@ public class Adopt extends PostCommon {
         this.endDate = adopt.getEndDate();
         this.shelterName = adopt.getShelterName();
         this.shelterPhone = adopt.getShelterPhone();
+        this.updateImage(adopt.getImages());
     }
 }
