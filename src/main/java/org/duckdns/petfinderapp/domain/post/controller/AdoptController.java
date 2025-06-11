@@ -15,7 +15,7 @@ public class AdoptController {
 
     // Adopt 상세 조회
     @GetMapping("/posts/adopt/{id}")
-    public ApiResponse<ResAdopt> apodt(@PathVariable Long id) {
+    public ApiResponse<ResAdopt> getAdopt(@PathVariable Long id) {
         return adoptService.searchAdopt(id);
     }
 }

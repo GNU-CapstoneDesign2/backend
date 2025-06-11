@@ -28,7 +28,7 @@ public class LostController {
 
     // lost 상세 조회
     @GetMapping("/posts/lost/{id}")
-    public ResLost Lost(@PathVariable Long id) {
+    public ResLost getLost(@PathVariable Long id) {
         return lostService.searchLost(id);
     }
 

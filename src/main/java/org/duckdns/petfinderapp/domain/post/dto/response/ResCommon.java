@@ -24,18 +24,18 @@ public class ResCommon {
     private ResCoordinates coordinates;
     private List<ImageDto> images;
 
-    public static ResCommon of(PostCommon Entity) {
+    public static ResCommon of(PostCommon post) {
         return ResCommon.builder()
-                .id(Entity.getId())
-                .userId(Entity.getUser() != null ? Entity.getUser().getId() : null)
-                .state(Entity.getState())
-                .createdAt(Entity.getCreateAt())
-                .date(Entity.getDate())
-                .address(Entity.getAddress())
-                .petType(Entity.getPetType())
-                .content(Entity.getContent())
-                .coordinates(new ResCoordinates(Entity.getCoordinates()))
-                .images(Entity.getImages().stream().map(ImageDto::new).collect(Collectors.toList()))
+                .id(post.getId())
+                .userId(post.getUser() != null ? post.getUser().getId() : null)
+                .state(post.getState())
+                .createdAt(post.getCreateAt())
+                .date(post.getDate())
+                .address(post.getAddress())
+                .petType(post.getPetType())
+                .content(post.getContent())
+                .coordinates(new ResCoordinates(post.getCoordinates()))
+                .images(post.getImages().stream().map(ImageDto::new).collect(Collectors.toList()))
                 .build();
     }
 }
