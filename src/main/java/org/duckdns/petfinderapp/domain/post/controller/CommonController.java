@@ -28,7 +28,7 @@ public class CommonController {
 
     // Found 상세 조회
     @GetMapping("/posts/found/{id}")
-    public ResCommon Found(@PathVariable Long id) {
+    public ResCommon getFound(@PathVariable Long id) {
         return commonService.searchFound(id);
     }
 
