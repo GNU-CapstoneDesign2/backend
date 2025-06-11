@@ -5,7 +5,6 @@ import lombok.Getter;
 import org.duckdns.petfinderapp.domain.post.entity.Adopt;
 
 @Getter
-@Builder
 public class ResAdopt {
     private Long id;
     private ResCommon common;
