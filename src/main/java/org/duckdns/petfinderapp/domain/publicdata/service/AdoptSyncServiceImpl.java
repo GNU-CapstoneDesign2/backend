@@ -43,9 +43,9 @@ public class AdoptSyncServiceImpl implements AdoptSyncService {
 	@Override
 	public Mono<Void> addNewAdopts() {
 		return fetchAdoptItems(NEW_FETCH_SIZE)
-			.flatMapSequential(this::convertToAdoptWithCoordinates)
-			.collectList()
-			.flatMap(this::saveAdopts);
+        .flatMapSequential(this::convertToAdoptWithCoordinates)
+        .collectList()
+        .flatMap(this::saveAdopts);
 	}
 
 	@Override
@@ -107,7 +107,16 @@ public class AdoptSyncServiceImpl implements AdoptSyncService {
 				return Flux.empty();
 			}
 			List<AdoptItem> items = body.items().item();
-			return items.isEmpty() ? Flux.empty() : Flux.fromIterable(items);
+			return Flux.fromIterable(items)
+					.doOnNext(item -> {
+						if (item.getImageUrls().isEmpty()) {
+							log.warn("이미지 URL 누락! desertionNo={} popfile1={}, popfile2={}, popfile3={}, popfile4={}, popfile5={}, popfile6={}, popfile7={}, popfile8={}",
+									item.desertionNo(),
+									item.popfile1(), item.popfile2(), item.popfile3(), item.popfile4(),
+									item.popfile5(), item.popfile6(), item.popfile7(), item.popfile8()
+							);
+						}
+					});
 		} catch (Exception e) {
 			log.warn("입양 동물 데이터 추출 실패", e);
 			return Flux.empty();
