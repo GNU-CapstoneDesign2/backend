@@ -170,6 +170,7 @@ public class PostService {
     return newAdopts.size();
   }
 
+  @Transactional(readOnly = true)
   public Page<PostSummaryResponse> getMyPosts(User user, Pageable pageable) {
     return postRepository.findAllByUser(user, pageable).map(PostSummaryResponse::of);
   }
