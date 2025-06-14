@@ -2,9 +2,11 @@ package org.duckdns.petfinderapp.domain.chat.service;
 
 import lombok.RequiredArgsConstructor;
 import org.duckdns.petfinderapp.domain.chat.dto.ChatRoomDto;
+import org.duckdns.petfinderapp.domain.chat.dto.ChatRoomPostDto;
 import org.duckdns.petfinderapp.domain.chat.entity.ChatMessage;
 import org.duckdns.petfinderapp.domain.chat.entity.ChatRoom;
 import org.duckdns.petfinderapp.domain.chat.repository.ChatRoomRepository;
+import org.duckdns.petfinderapp.domain.post.dto.response.PostSummaryResponse;
 import org.duckdns.petfinderapp.domain.user.entity.User;
 import org.springframework.stereotype.Service;
 
@@ -58,5 +60,22 @@ public class ChatRoomService {
         }
 
         return result;
+    }
+
+    public ChatRoomPostDto getChatRoomPost(Long roomId, Long currentUserId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
+
+        if (!isParticipant(chatRoom, currentUserId)) {
+            throw new IllegalArgumentException("해당 채팅방의 참여자가 아닙니다.");
+        }
+
+        PostSummaryResponse postSummary = PostSummaryResponse.of(chatRoom.getPost());
+        return ChatRoomPostDto.from(chatRoom, postSummary, currentUserId);
+    }
+
+    private boolean isParticipant(ChatRoom chatRoom, Long userId) {
+        return chatRoom.getSender().getId().equals(userId) ||
+                chatRoom.getReceiver().getId().equals(userId);
     }
 }

@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.duckdns.petfinderapp.domain.chat.dto.ChatMessageDto;
 import org.duckdns.petfinderapp.domain.chat.dto.ChatRoomDto;
+import org.duckdns.petfinderapp.domain.chat.dto.ChatRoomPostDto;
 import org.duckdns.petfinderapp.domain.chat.service.ChatMessageService;
 import org.duckdns.petfinderapp.domain.chat.service.ChatRoomService;
 import org.duckdns.petfinderapp.domain.user.entity.User;
@@ -37,11 +38,23 @@ public class ChatRoomController {
         return ApiResponse.onSuccess(HttpStatus.OK, "채팅 메시지 조회 성공", data);
     }
 
+    // 채팅방 목록 조회
     @GetMapping("")
     public ApiResponse<List<ChatRoomDto>> getChatRoomList(
             @AuthenticationPrincipal @NotNull User user
     ) {
         List<ChatRoomDto> chatRooms = chatRoomService.getChatRoomList(user.getId());
-        return ApiResponse.onSuccess(HttpStatus.OK, "채팅 목록 조회 성공", chatRooms);
+        return ApiResponse.onSuccess(HttpStatus.OK, "채팅방 목록 조회 성공", chatRooms);
+    }
+
+    // 상세조회
+    @GetMapping("/{roomId}")
+    public ApiResponse<ChatRoomPostDto> getChatRoomPost(
+            @PathVariable @NotNull Long roomId,
+            @AuthenticationPrincipal @NotNull User user
+    ){
+        ChatRoomPostDto chatRoomPost = chatRoomService.getChatRoomPost(roomId, user.getId());
+
+        return ApiResponse.onSuccess(HttpStatus.OK, "채팅방 상세 조회 성공", chatRoomPost);
     }
 }
