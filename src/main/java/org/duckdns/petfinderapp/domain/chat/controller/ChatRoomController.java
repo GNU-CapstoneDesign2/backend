@@ -3,7 +3,9 @@ package org.duckdns.petfinderapp.domain.chat.controller;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.duckdns.petfinderapp.domain.chat.dto.ChatMessageDto;
+import org.duckdns.petfinderapp.domain.chat.dto.ChatRoomDto;
 import org.duckdns.petfinderapp.domain.chat.service.ChatMessageService;
+import org.duckdns.petfinderapp.domain.chat.service.ChatRoomService;
 import org.duckdns.petfinderapp.domain.user.entity.User;
 import org.duckdns.petfinderapp.global.template.ApiResponse;
 import org.springframework.data.domain.Page;
@@ -15,12 +17,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/chatrooms")
 public class ChatRoomController {
 
     private final ChatMessageService chatMessageService;
+    private final ChatRoomService chatRoomService;
 
     @GetMapping("/{roomId}/messages")
     public ApiResponse<Page<ChatMessageDto>> getChatRoomMessages(
@@ -30,5 +35,13 @@ public class ChatRoomController {
 
         Page<ChatMessageDto> data = chatMessageService.getChatRoomMessages(user, roomId, pageable);
         return ApiResponse.onSuccess(HttpStatus.OK, "채팅 메시지 조회 성공", data);
+    }
+
+    @GetMapping("")
+    public ApiResponse<List<ChatRoomDto>> getChatRoomList(
+            @AuthenticationPrincipal @NotNull User user
+    ) {
+        List<ChatRoomDto> chatRooms = chatRoomService.getChatRoomList(user.getId());
+        return ApiResponse.onSuccess(HttpStatus.OK, "채팅 목록 조회 성공", chatRooms);
     }
 }
