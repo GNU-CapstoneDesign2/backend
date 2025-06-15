@@ -17,6 +17,7 @@ import org.duckdns.petfinderapp.domain.post.repository.PostRepository;
 import org.duckdns.petfinderapp.domain.user.entity.User;
 import org.duckdns.petfinderapp.domain.user.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final PostRepository postRepository;
 
+    @Transactional(readOnly = true)
     public List<ChatRoomDto> getChatRoomList(Long userId) {
         // DB에서 해당 사용자가 참여한 채팅방들을 가져온다
         List<ChatRoom> chatRooms = chatRoomRepository.findChatRoomsByUserIdOrderByLatest(userId);

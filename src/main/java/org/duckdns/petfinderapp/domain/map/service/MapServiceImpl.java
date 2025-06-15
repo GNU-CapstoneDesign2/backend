@@ -88,9 +88,13 @@ public class MapServiceImpl implements MapService {
     });
 
     List<MarkerItem> markerItemList = postRepository.findAll(spec).stream()
-        .map(postCommon -> MarkerItem.of(postCommon, postCommon.getImages().get(0).getFileURL()))
+        .map(postCommon -> MarkerItem.of(postCommon, getFirstImageUrl(postCommon)))
         .toList();
 
     return MapMarkerResponse.from(markerItemList);
+  }
+
+  private String getFirstImageUrl(PostCommon postCommon) {
+    return postCommon.getImages().isEmpty() ? null : postCommon.getImages().get(0).getFileURL();
   }
 }
