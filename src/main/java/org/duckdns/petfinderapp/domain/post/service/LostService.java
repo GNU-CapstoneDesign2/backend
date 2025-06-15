@@ -9,7 +9,6 @@ import org.duckdns.petfinderapp.domain.post.entity.Image;
 import org.duckdns.petfinderapp.domain.post.entity.Lost;
 import org.duckdns.petfinderapp.domain.post.entity.PostCommon;
 import org.duckdns.petfinderapp.domain.post.repository.LostRepository;
-import org.duckdns.petfinderapp.domain.similarity.dto.request.ImageAiEmbeddingRequest;
 import org.duckdns.petfinderapp.domain.similarity.service.EmbeddingService;
 import org.duckdns.petfinderapp.domain.user.entity.User;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,7 @@ public class LostService {
 
     // 게시글 작성
     @Transactional
-    public Long create(LostCreate dto, List<MultipartFile> image, User user) {
+    public PostCommon create(LostCreate dto, List<MultipartFile> image, User user) {
         CommonCreate commonDto = dto.getCommonCreate();
         ReqLost req = dto.getReqLost();
 
@@ -75,12 +74,7 @@ public class LostService {
             }
         }
 
-        PostCommon savedPost = lostRepository.save(lost);
-
-        // 이미지 임베딩 요청 이벤트 발행
-        embeddingService.sendLostEmbeddingRequest(ImageAiEmbeddingRequest.of(savedPost));
-
-        return savedPost.getId();
+      return lostRepository.save(lost);
     }
 
     // Lost 조회

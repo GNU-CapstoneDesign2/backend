@@ -2,7 +2,6 @@ package org.duckdns.petfinderapp.domain.similarity.entity;
 
 import org.duckdns.petfinderapp.domain.post.entity.PostCommon;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -33,7 +32,4 @@ public class Similarity {
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "similar_post_id", nullable = false)
 	private PostCommon similarPost;
-
-	@Column(nullable = false)
-	private Double score;
 }

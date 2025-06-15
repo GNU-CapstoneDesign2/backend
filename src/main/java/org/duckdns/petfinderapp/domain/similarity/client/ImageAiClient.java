@@ -1,5 +1,6 @@
 package org.duckdns.petfinderapp.domain.similarity.client;
 
+import java.util.List;
 import org.duckdns.petfinderapp.domain.similarity.dto.request.ImageAiEmbeddingRequest;
 import org.duckdns.petfinderapp.domain.similarity.dto.request.SimilarityRequest;
 import org.duckdns.petfinderapp.domain.similarity.dto.response.ImageAiSimilarityResponse;
@@ -29,11 +30,14 @@ public class ImageAiClient {
 	}
 
 	public ImageAiSimilarityResponse fetchSimilarLostPosts(SimilarityRequest similarityRequest) {
-		return webClient.post()
-			.uri(uriBuilder ->uriBuilder.path("/find_missing_with_sighting_forAlarm").build())
-			.body(Mono.just(similarityRequest), SimilarityRequest.class)
-			.exchangeToMono(this::handleResponse)
-			.block();
+		//TODO: 테스트용 모킹
+		return new ImageAiSimilarityResponse(1L, 3, List.of(1L, 2L, 3L));
+
+//		return webClient.post()
+//			.uri(uriBuilder ->uriBuilder.path("/find_missing_with_sighting_forAlarm").build())
+//			.body(Mono.just(similarityRequest), SimilarityRequest.class)
+//			.exchangeToMono(this::handleResponse)
+//			.block();
 	}
 
 	public void fetchEmbeddingLostRequest(ImageAiEmbeddingRequest request) {

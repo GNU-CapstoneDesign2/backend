@@ -20,7 +20,6 @@ import org.duckdns.petfinderapp.domain.post.entity.Image;
 import org.duckdns.petfinderapp.domain.post.entity.PostCommon;
 import org.duckdns.petfinderapp.domain.post.repository.AdoptRepository;
 import org.duckdns.petfinderapp.domain.post.repository.PostRepository;
-import org.duckdns.petfinderapp.domain.similarity.dto.request.ImageAiEmbeddingRequest;
 import org.duckdns.petfinderapp.domain.similarity.service.EmbeddingService;
 import org.duckdns.petfinderapp.domain.user.entity.User;
 import org.springframework.data.domain.Page;
@@ -43,7 +42,7 @@ public class PostService {
 
   // 게시글 작성
   @Transactional
-  public Long create(CommonCreate commonCreate, List<MultipartFile> image, User user) {
+  public PostCommon create(CommonCreate commonCreate, List<MultipartFile> image, User user) {
     Found common = commonCreate.toFound(user);
 
     if (image != null && !image.isEmpty()) {
@@ -68,12 +67,7 @@ public class PostService {
       }
     }
 
-    PostCommon savedPost = postRepository.save(common);
-
-    // 이미지 임베딩 요청 이벤트 발행
-    embeddingService.sendOtherEmbeddingRequest(ImageAiEmbeddingRequest.of(savedPost));
-
-    return savedPost.getId();
+    return postRepository.save(common);
   }
 
   // Found 조회
