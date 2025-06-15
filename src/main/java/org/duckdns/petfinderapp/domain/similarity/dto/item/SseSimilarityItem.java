@@ -17,8 +17,8 @@ public record SseSimilarityItem(
 	public static SseSimilarityItem of(Similarity similarity) {
 		return SseSimilarityItem.builder()
 			.similarPostId(similarity.getSimilarPost().getId())
-			.imageUrl(similarity.getSimilarPost().getImages().isEmpty() ? null :
-				similarity.getSimilarPost().getImages().get(0).getFileURL())
+			.imageUrl(similarity.getSimilarPost().getImages().isEmpty() ?
+					null : similarity.getSimilarPost().getImages().get(0).getFileURL())
 			.postState(similarity.getSimilarPost().getState())
 			.date(similarity.getSimilarPost().getDate().toString())
 			.address(similarity.getSimilarPost().getAddress())

@@ -14,6 +14,8 @@ import org.duckdns.petfinderapp.domain.similarity.dto.request.SimilarityRequest;
 import org.duckdns.petfinderapp.domain.similarity.dto.response.ImageAiSimilarityResponse;
 import org.duckdns.petfinderapp.domain.similarity.dto.response.SseSimilarityResponse;
 import org.duckdns.petfinderapp.domain.similarity.entity.Similarity;
+import org.duckdns.petfinderapp.domain.similarity.exception.SimilarityAccessDeniedException;
+import org.duckdns.petfinderapp.domain.user.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -75,16 +77,16 @@ public class SimilarityService {
 
 		saveSimilarResponse(postState, response);
 
-		sendSimilarPostPushNotification(postId, postState);
+		response.postIdList().forEach(this::sendSimilarPostPushNotification);
 	}
 
-	private void sendSimilarPostPushNotification(Long postId, PostState postState) {
+	private void sendSimilarPostPushNotification(Long postId) {
 		PostCommon post = postRepository.findById(postId)
 			.orElseThrow(PostNotFoundException::missingPostCommon);
 		 fcmService.sendMessage(
 		 	post.getUser(),
 		 	"유사 게시글 알림",
-		 	String.format("등록된 게시글과 유사한 %s글이 올라왔어요", postState.toKoreanString())
+		 	String.format("등록된 게시글과 유사한 %s글이 올라왔어요", post.getState().toKoreanString())
 		 );
 	}
 
@@ -110,7 +112,13 @@ public class SimilarityService {
 		return similarityRepository.saveAll(similarityList);
 	}
 
-	public SseEmitter subscribeToSimilarity(Long postId) {
+	public SseEmitter subscribeToSimilarity(User user, Long postId) {
+		PostCommon post = postRepository.findById(postId)
+				.orElseThrow(PostNotFoundException::missingPostCommon);
+		if (!post.getUser().getId().equals(user.getId())) {
+      throw SimilarityAccessDeniedException.accessDenied();
+    }
+
 		SseEmitter emitter = notifier.register(postId);
 
 		// 1) 기존 데이터 조회
