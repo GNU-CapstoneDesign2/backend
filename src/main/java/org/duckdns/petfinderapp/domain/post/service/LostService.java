@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.duckdns.petfinderapp.domain.chat.entity.ChatRoom;
 import org.duckdns.petfinderapp.domain.chat.repository.ChatRoomRepository;
 import org.duckdns.petfinderapp.domain.post.dto.request.*;
-import org.duckdns.petfinderapp.domain.post.dto.response.ResCommon;
 import org.duckdns.petfinderapp.domain.post.dto.response.ResLost;
 import org.duckdns.petfinderapp.domain.post.entity.Image;
 import org.duckdns.petfinderapp.domain.post.entity.Lost;
+import org.duckdns.petfinderapp.domain.post.entity.PostCommon;
 import org.duckdns.petfinderapp.domain.post.repository.LostRepository;
+import org.duckdns.petfinderapp.domain.similarity.dto.request.ImageAiEmbeddingRequest;
+import org.duckdns.petfinderapp.domain.similarity.service.EmbeddingService;
 import org.duckdns.petfinderapp.domain.user.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class LostService {
     private final LostRepository lostRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final S3Uploader s3Uploader;
+    private final EmbeddingService embeddingService;
 
     // 게시글 작성
     @Transactional
@@ -73,7 +75,12 @@ public class LostService {
             }
         }
 
-        return lostRepository.save(lost).getId();
+        PostCommon savedPost = lostRepository.save(lost);
+
+        // 이미지 임베딩 요청 이벤트 발행
+        embeddingService.sendLostEmbeddingRequest(ImageAiEmbeddingRequest.of(savedPost));
+
+        return savedPost.getId();
     }
 
     // Lost 조회
