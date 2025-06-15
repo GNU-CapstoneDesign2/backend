@@ -1,6 +1,5 @@
 package org.duckdns.petfinderapp.domain.chat.repository;
 
-import org.duckdns.petfinderapp.domain.chat.entity.ChatMessage;
 import org.duckdns.petfinderapp.domain.chat.entity.ChatRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,4 +20,6 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     @Query("SELECT cr FROM ChatRoom cr WHERE cr.post.id = :postId AND " +
             "(cr.sender.id = :userId OR cr.receiver.id = :userId)")
     Optional<ChatRoom> findByPostIdAndUserId(@Param("postId") Long postId, @Param("userId") Long userId);
+
+  	Optional<Object> findChatRoomByPostId(Long postId);
 }

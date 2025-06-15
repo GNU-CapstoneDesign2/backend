@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.duckdns.petfinderapp.domain.chat.dto.ChatMessageDto;
 import org.duckdns.petfinderapp.domain.chat.dto.ChatRoomDto;
 import org.duckdns.petfinderapp.domain.chat.dto.ChatRoomPostDto;
+import org.duckdns.petfinderapp.domain.chat.dto.request.ChatRoomCreateResponse;
+import org.duckdns.petfinderapp.domain.chat.dto.resposne.ChatRoomCreateRequest;
 import org.duckdns.petfinderapp.domain.chat.service.ChatMessageService;
 import org.duckdns.petfinderapp.domain.chat.service.ChatRoomService;
 import org.duckdns.petfinderapp.domain.user.entity.User;
@@ -15,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -56,5 +60,15 @@ public class ChatRoomController {
         ChatRoomPostDto chatRoomPost = chatRoomService.getChatRoomPost(roomId, user.getId());
 
         return ApiResponse.onSuccess(HttpStatus.OK, "채팅방 상세 조회 성공", chatRoomPost);
+    }
+
+    @PostMapping("")
+    public ApiResponse<ChatRoomCreateResponse> createChatRoom(
+            @AuthenticationPrincipal User user,
+            @RequestBody ChatRoomCreateRequest chatRoomCreateRequest
+    ) {
+
+        ChatRoomCreateResponse chatRoom = chatRoomService.createChatRoom(user, chatRoomCreateRequest);
+        return ApiResponse.onSuccess(HttpStatus.CREATED, "채팅방 생성 성공", chatRoom);
     }
 }
