@@ -37,7 +37,7 @@ public class Push {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public void Pushread() {
+    public void pushread() {
         this.isRead = true;
     }
 }

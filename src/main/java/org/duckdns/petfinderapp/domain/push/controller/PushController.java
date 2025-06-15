@@ -19,16 +19,16 @@ public class PushController {
     private final PushService pushService;
 
     @GetMapping("/notices")
-    public ResponseEntity<ApiResponse<List<PushDto>>> getPushs(@AuthenticationPrincipal User user) {
+    public ApiResponse<List<PushDto>> getPushs(@AuthenticationPrincipal User user) {
         List<PushDto> pushs = pushService.getPushNotifications(user);
-        return ResponseEntity.ok(ApiResponse.onSuccess(HttpStatus.OK, "알림 목록 조회 성공", pushs));
+        return ApiResponse.onSuccess(HttpStatus.OK, "알림 목록 조회 성공", pushs);
     }
 
-    @PatchMapping("notice/{id}/read")
-    public ResponseEntity<ApiResponse<Void>> markAsRead(
+    @PatchMapping("notices/{id}/read")
+    public ApiResponse<Void> markAsRead(
             @AuthenticationPrincipal User user,
             @PathVariable Long id) {
         pushService.isRead(user, id);
-        return ResponseEntity.ok(ApiResponse.onSuccess(HttpStatus.OK, "알림 읽음 처리 성공", null));
+        return ApiResponse.onSuccess(HttpStatus.OK, "알림 읽음 처리 성공", null);
     }
 }

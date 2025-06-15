@@ -35,6 +35,6 @@ public class PushService {
             throw new AccessDeniedException("권한이 없습니다.");
         }
 
-        push.Pushread();
+        push.pushread();
     }
 }
