@@ -29,6 +29,8 @@ public class Push {
 
     private String message;
 
+    private String redirect;
+
     @Builder.Default
     @Column(name = "is_read")
     private Boolean isRead = false;

@@ -17,7 +17,9 @@ public class PushDto {
     private String title;
     private String message;
     private Boolean isRead;
+    private String redirect;
     private LocalDateTime createdAt;
+
 
     public static PushDto from(Push push) {
         return PushDto.builder()
@@ -25,6 +27,7 @@ public class PushDto {
                 .title(push.getTitle())
                 .message(push.getMessage())
                 .isRead(push.getIsRead())
+                .redirect(push.getRedirect())
                 .createdAt(push.getCreatedAt())
                 .build();
     }

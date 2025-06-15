@@ -25,7 +25,7 @@ public class FcmController {
     @PostMapping("notice/send")
     public ResponseEntity<Void> send(@RequestBody FcmResponseDto dto,
                                      @AuthenticationPrincipal User user){
-        fcmService.sendMessage(user, dto.getTitle(), dto.getMessage());
+        fcmService.sendMessage(user, dto);
         return ResponseEntity.ok().build();
     }
 }
