@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.duckdns.petfinderapp.domain.post.entity.PostCommon;
 import org.duckdns.petfinderapp.domain.user.entity.User;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,8 +23,8 @@ public class ChatRoom {
 
     @Column(name = "create_at",
             nullable = false,
-            updatable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+            updatable = false)
+    @CreationTimestamp
     private LocalDateTime createAt;
 
     /** 연관된 게시글 */
@@ -41,11 +42,15 @@ public class ChatRoom {
     @JoinColumn(name = "receiver_id", nullable = false)
     private User receiver;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chat_id", nullable = false)
-    private ChatRoom chatRoom;
-
     @Builder.Default
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatMessage> messages = new ArrayList<>();
+
+    public static ChatRoom of(PostCommon post, User sender, User receiver) {
+        return ChatRoom.builder()
+            .post(post)
+            .sender(sender)
+            .receiver(receiver)
+            .build();
+    }
 }
