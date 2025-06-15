@@ -1,7 +1,10 @@
 package org.duckdns.petfinderapp.domain.post.service;
 
 import lombok.RequiredArgsConstructor;
+import org.duckdns.petfinderapp.domain.chat.entity.ChatRoom;
+import org.duckdns.petfinderapp.domain.chat.repository.ChatRoomRepository;
 import org.duckdns.petfinderapp.domain.post.dto.request.*;
+import org.duckdns.petfinderapp.domain.post.dto.response.ResCommon;
 import org.duckdns.petfinderapp.domain.post.dto.response.ResLost;
 import org.duckdns.petfinderapp.domain.post.entity.Image;
 import org.duckdns.petfinderapp.domain.post.entity.Lost;
@@ -20,6 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LostService {
     private final LostRepository lostRepository;
+    private final ChatRoomRepository chatRoomRepository;
     private final S3Uploader s3Uploader;
 
     // 게시글 작성
@@ -74,10 +78,21 @@ public class LostService {
 
     // Lost 조회
     @Transactional(readOnly = true)
-    public ResLost searchLost(Long id) {
+    public ResLost searchLost(Long id, User user) {
         Lost lost = lostRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다."));
-        return new ResLost(lost);
+
+        // 게시글 작성자인 경우 chatRoomId는 null
+        if (lost.getUser().getId().equals(user.getId())) {
+            return new ResLost(lost);
+        }
+
+        // 사용자가 참여 중인 채팅방 조회
+        Long chatRoomId = chatRoomRepository.findByPostIdAndUserId(id, user.getId())
+                .map(ChatRoom::getId)
+                .orElse(null);
+
+        return new ResLost(lost, chatRoomId);
     }
 
     // lost 게시글 수정

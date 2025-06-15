@@ -2,6 +2,7 @@ package org.duckdns.petfinderapp.domain.post.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.duckdns.petfinderapp.domain.chat.entity.ChatRoom;
 import org.duckdns.petfinderapp.domain.post.entity.PostCommon;
 import org.duckdns.petfinderapp.domain.post.enums.PetType;
 import org.duckdns.petfinderapp.domain.post.enums.PostState;
@@ -12,10 +13,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-@Builder
+@Builder (toBuilder = true)
 public class ResCommon {
     private Long id;
     private Long userId;
+    private Long chatId;
     private String userName;
     private String userImg;
     private PostState state;
@@ -35,6 +37,7 @@ public class ResCommon {
                 .userId(post.getUser() != null ? post.getUser().getId() : null)
                 .userName(user != null ? user.getName() : null)
                 .userImg(user != null ? user.getImageUrl() : null)
+                .chatId(null)
                 .state(post.getState())
                 .createdAt(post.getCreateAt())
                 .date(post.getDate())
@@ -43,6 +46,12 @@ public class ResCommon {
                 .content(post.getContent())
                 .coordinates(new ResCoordinates(post.getCoordinates()))
                 .images(post.getImages().stream().map(ImageDto::new).collect(Collectors.toList()))
+                .build();
+    }
+
+    public static ResCommon of(PostCommon post, Long chatRoomId) {
+        return of(post).toBuilder()
+                .chatId(chatRoomId)
                 .build();
     }
 }

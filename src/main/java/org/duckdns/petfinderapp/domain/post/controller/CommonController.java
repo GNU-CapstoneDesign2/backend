@@ -28,8 +28,10 @@ public class CommonController {
 
     // Found 상세 조회
     @GetMapping("/posts/found/{id}")
-    public ResCommon getFound(@PathVariable Long id) {
-        return commonService.searchFound(id);
+    public ResCommon getFound(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user) {
+        return commonService.searchFound(id, user);
     }
 
     // found 게시글 수정
