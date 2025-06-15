@@ -7,4 +7,5 @@ public class FcmResponseDto {
     private String token;
     private String title;
     private String message;
+    private String redirect;
 }
