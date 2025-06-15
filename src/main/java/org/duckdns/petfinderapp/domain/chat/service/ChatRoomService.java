@@ -73,6 +73,7 @@ public class ChatRoomService {
         return result;
     }
 
+    @Transactional(readOnly = true)
     public ChatRoomPostDto getChatRoomPost(Long roomId, Long currentUserId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
