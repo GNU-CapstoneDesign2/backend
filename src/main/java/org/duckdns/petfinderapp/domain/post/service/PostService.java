@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.duckdns.petfinderapp.domain.chat.entity.ChatRoom;
+import org.duckdns.petfinderapp.domain.chat.repository.ChatRoomRepository;
 import org.duckdns.petfinderapp.domain.post.dto.request.CommonCreate;
 import org.duckdns.petfinderapp.domain.post.dto.request.CommonUpdate;
 import org.duckdns.petfinderapp.domain.post.dto.response.PostSummaryResponse;
@@ -33,6 +35,7 @@ public class PostService {
 
   private final PostRepository postRepository;
   private final AdoptRepository adoptRepository;
+  private final ChatRoomRepository chatRoomRepository;
   private final S3Uploader s3Uploader;
 
   // 게시글 작성
@@ -67,13 +70,24 @@ public class PostService {
 
   // Found 조회
   @Transactional(readOnly = true)
-  public ResCommon searchFound(Long id) {
+  public ResCommon searchFound(Long id, User user) {
     PostCommon common = postRepository.findById(id)
         .orElseThrow(() -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다."));
     if (!(common instanceof Found found)) {
       throw new IllegalArgumentException("해당 게시물은 FOUND 타입이 아닙니다.");
     }
-    return ResCommon.of(found);
+
+    // 게시글 작성자인 경우 chatRoomId는 null
+    if (found.getUser().getId().equals(user.getId())) {
+      return ResCommon.of(found);
+    }
+
+    // 사용자가 참여 중인 채팅방 조회
+    Long chatRoomId = chatRoomRepository.findByPostIdAndUserId(id, user.getId())
+            .map(ChatRoom::getId)
+            .orElse(null);
+
+    return ResCommon.of(found, chatRoomId);
   }
 
 

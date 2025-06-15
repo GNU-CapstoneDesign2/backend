@@ -28,8 +28,9 @@ public class LostController {
 
     // lost 상세 조회
     @GetMapping("/posts/lost/{id}")
-    public ResLost getLost(@PathVariable Long id) {
-        return lostService.searchLost(id);
+    public ResLost getLost(@PathVariable Long id,
+                           @AuthenticationPrincipal User user) {
+        return lostService.searchLost(id, user);
     }
 
     // lost 업데이트

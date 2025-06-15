@@ -14,4 +14,10 @@ public class ResLost {
         this.common = ResCommon.of(lost);
         this.lost = new LostDto(lost);
     }
+
+    public ResLost(Lost lost, Long chatRoomId) {
+        this.id = lost.getId();
+        this.common = ResCommon.of(lost, chatRoomId);
+        this.lost = new LostDto(lost);
+    }
 }

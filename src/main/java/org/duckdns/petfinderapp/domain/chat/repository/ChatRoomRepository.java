@@ -16,5 +16,10 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
             "ORDER BY cr.createAt DESC")
     List<ChatRoom> findChatRoomsByUserIdOrderByLatest(@Param("userId") Long userId);
 
-	Optional<Object> findChatRoomByPostId(Long postId);
+    // 게시글 ID에 대한 유저 ID 조회
+    @Query("SELECT cr FROM ChatRoom cr WHERE cr.post.id = :postId AND " +
+            "(cr.sender.id = :userId OR cr.receiver.id = :userId)")
+    Optional<ChatRoom> findByPostIdAndUserId(@Param("postId") Long postId, @Param("userId") Long userId);
+
+  	Optional<Object> findChatRoomByPostId(Long postId);
 }
