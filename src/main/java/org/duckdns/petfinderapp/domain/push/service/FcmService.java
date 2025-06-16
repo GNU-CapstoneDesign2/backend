@@ -78,6 +78,7 @@ public class FcmService {
                     .redirect(dto.getRedirect())
                     .build();
             pushRepository.save(push);
+            log.info("푸시 알림 저장 성공: {}", push);
 
         } catch (FirebaseMessagingException e) {
             e.printStackTrace();
