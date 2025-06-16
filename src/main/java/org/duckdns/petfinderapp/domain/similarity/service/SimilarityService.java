@@ -124,17 +124,21 @@ public class SimilarityService {
     return similarityRepository.saveAll(similarityList);
   }
 
+  @Transactional(readOnly = true)
   public SseEmitter subscribeToSimilarity(User user, Long postId) {
     PostCommon post = postRepository.findById(postId)
         .orElseThrow(PostNotFoundException::missingPostCommon);
     if (!post.getUser().getId().equals(user.getId())) {
       throw SimilarityAccessDeniedException.accessDenied();
     }
+    if (post.getState() != PostState.LOST) {
+      throw SimilarityAccessDeniedException.accessDenied();
+    }
 
     SseEmitter emitter = notifier.register(postId);
 
     // 1) 기존 데이터 조회
-    List<SseSimilarityItem> existing = similarityRepository.findAllByLostPostId(postId)
+    List<SseSimilarityItem> existing = similarityRepository.findAllWithImagesByLostPostId(postId)
         .stream().map(SseSimilarityItem::of).toList();
 
     // 2) 이미 값이 있으면 즉시 전송
