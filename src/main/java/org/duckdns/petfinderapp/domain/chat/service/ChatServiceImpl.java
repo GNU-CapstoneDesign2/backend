@@ -3,7 +3,7 @@ package org.duckdns.petfinderapp.domain.chat.service;
 import java.util.Optional;
 
 import org.duckdns.petfinderapp.domain.chat.dto.ChatMessageDto;
-import org.duckdns.petfinderapp.domain.chat.dto.resposne.ReadMessageDto;
+import org.duckdns.petfinderapp.domain.chat.dto.response.ReadMessageDto;
 import org.duckdns.petfinderapp.domain.chat.entity.ChatMessage;
 import org.duckdns.petfinderapp.domain.chat.entity.ChatRoom;
 import org.duckdns.petfinderapp.domain.chat.exception.ChatRoomAccessDeniedException;

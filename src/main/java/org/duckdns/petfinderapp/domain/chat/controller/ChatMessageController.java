@@ -1,7 +1,7 @@
 package org.duckdns.petfinderapp.domain.chat.controller;
 
 import org.duckdns.petfinderapp.domain.chat.dto.ChatMessageDto;
-import org.duckdns.petfinderapp.domain.chat.dto.resposne.ReadMessageDto;
+import org.duckdns.petfinderapp.domain.chat.dto.response.ReadMessageDto;
 import org.duckdns.petfinderapp.domain.chat.service.ChatService;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;

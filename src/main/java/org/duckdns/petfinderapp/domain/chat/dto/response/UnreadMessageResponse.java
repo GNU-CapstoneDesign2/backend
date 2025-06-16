@@ -1,4 +1,4 @@
-package org.duckdns.petfinderapp.domain.chat.dto.resposne;
+package org.duckdns.petfinderapp.domain.chat.dto.response;
 
 public record UnreadMessageResponse(
     Integer unreadCount
