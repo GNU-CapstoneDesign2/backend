@@ -1,5 +1,6 @@
 package org.duckdns.petfinderapp.domain.post.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import org.duckdns.petfinderapp.domain.post.entity.Image;
 import org.duckdns.petfinderapp.domain.post.entity.PostCommon;
 import org.duckdns.petfinderapp.domain.post.repository.AdoptRepository;
 import org.duckdns.petfinderapp.domain.post.repository.PostRepository;
+import org.duckdns.petfinderapp.domain.similarity.service.EmbeddingService;
 import org.duckdns.petfinderapp.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -37,10 +38,11 @@ public class PostService {
   private final AdoptRepository adoptRepository;
   private final ChatRoomRepository chatRoomRepository;
   private final S3Uploader s3Uploader;
+  private final EmbeddingService embeddingService;
 
   // 게시글 작성
   @Transactional
-  public Long create(CommonCreate commonCreate, List<MultipartFile> image, User user) {
+  public PostCommon create(CommonCreate commonCreate, List<MultipartFile> image, User user) {
     Found common = commonCreate.toFound(user);
 
     if (image != null && !image.isEmpty()) {
@@ -65,7 +67,7 @@ public class PostService {
       }
     }
 
-    return postRepository.save(common).getId();
+    return postRepository.save(common);
   }
 
   // Found 조회
@@ -159,7 +161,7 @@ public class PostService {
   }
 
   @Transactional
-  public Integer upsertAdopts(List<Adopt> newAdoptList) {
+  public List<Adopt> upsertAdoptsAndReturnAdoptNeedsEmbedding(List<Adopt> newAdoptList) {
     List<String> newDesertionNumList = newAdoptList.stream()
         .map(Adopt::getDesertionNum)
         .toList();
@@ -170,22 +172,43 @@ public class PostService {
         .collect(Collectors.toMap(Adopt::getDesertionNum, Function.identity()));
 
     List<Adopt> newAdopts = new ArrayList<>();
+    List<Adopt> needsEmbedding = new ArrayList<>();
 
     for (Adopt newAdopt : newAdoptList) {
       Adopt existingAdopt = existingMap.get(newAdopt.getDesertionNum());
       if (existingAdopt != null) {
+        if (hasImageChanged(existingAdopt, newAdopt)) {
+          needsEmbedding.add(existingAdopt);
+        }
+
         existingAdopt.updateWith(newAdopt);
+
       } else {
         newAdopts.add(newAdopt);
       }
     }
 
-    adoptRepository.saveAll(newAdopts);
-    return newAdopts.size();
+    List<Adopt> savedNew = adoptRepository.saveAll(newAdopts);
+    needsEmbedding.addAll(savedNew);
+    return needsEmbedding;
   }
 
   @Transactional(readOnly = true)
   public Page<PostSummaryResponse> getMyPosts(User user, Pageable pageable) {
     return postRepository.findAllByUser(user, pageable).map(PostSummaryResponse::of);
+  }
+
+  private boolean hasImageChanged(Adopt existing, Adopt updated) {
+    if (existing.getImages().size() != updated.getImages().size()) {
+      return true;
+    }
+    for (int i = 0; i < existing.getImages().size(); i++) {
+      Image existingImage = existing.getImages().get(i);
+      Image updatedImage = updated.getImages().get(i);
+      if (!existingImage.getFileURL().equals(updatedImage.getFileURL())) {
+        return true;
+      }
+    }
+    return false;
   }
 }

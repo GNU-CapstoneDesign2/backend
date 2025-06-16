@@ -17,6 +17,8 @@ import org.duckdns.petfinderapp.domain.publicdata.dto.response.PublicDataBodyRes
 import org.duckdns.petfinderapp.domain.publicdata.dto.response.SgisGeocodingItem;
 import org.duckdns.petfinderapp.domain.publicdata.dto.response.SgisGeocodingResult;
 import org.duckdns.petfinderapp.domain.publicdata.dto.response.SgisResponse;
+import org.duckdns.petfinderapp.domain.similarity.dto.request.ImageAiEmbeddingRequest;
+import org.duckdns.petfinderapp.domain.similarity.service.EmbeddingService;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,7 @@ public class AdoptSyncServiceImpl implements AdoptSyncService {
 	private final SgisClient sgisClient;
 	private final PostService postService;
 	private final SgisTokenService sgisTokenService;
+	private final EmbeddingService embeddingService;
 
 	@Override
 	public Mono<Void> addNewAdopts() {
@@ -185,9 +188,14 @@ public class AdoptSyncServiceImpl implements AdoptSyncService {
 			return Mono.empty();
 		}
 		log.info("입양 동물 데이터 저장 시작 - 총 {}건", adopts.size());
-		return Mono.fromCallable(() -> postService.upsertAdopts(adopts))
+		return Mono.fromCallable(() -> postService.upsertAdoptsAndReturnAdoptNeedsEmbedding(adopts))
 			.publishOn(Schedulers.boundedElastic())
-			.doOnSuccess(count -> log.info("저장 완료 - 추가된 {}건", count))
+			.flatMapMany(Flux::fromIterable)
+			.flatMap(adopt -> Mono.fromRunnable(
+				() -> {
+					// 이미지 임베딩 요청 이벤트 발행
+					embeddingService.sendOtherEmbeddingRequest(ImageAiEmbeddingRequest.of(adopt));
+				}))
 			.then();
 	}
 }

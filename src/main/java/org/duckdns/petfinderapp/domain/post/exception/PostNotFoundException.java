@@ -8,7 +8,12 @@ public class PostNotFoundException extends NotFoundGroupException {
     super(message);
   }
 
-  public static PostNotFoundException missingPost() {
+  public static PostNotFoundException missingPostCommon(Long postId) {
+    return new PostNotFoundException(postId + " 게시글이 존재하지 않습니다.");
+  }
+
+  public static PostNotFoundException missingPostCommon() {
     return new PostNotFoundException("해당 게시글이 존재하지 않습니다.");
   }
 }
+

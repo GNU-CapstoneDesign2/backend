@@ -8,6 +8,16 @@ public enum PostState {
 	END     // 보호종료
 	;
 
+	public String toKoreanString() {
+		return switch (this) {
+			case NOTICE -> "공고";
+			case ADOPT -> "입양";
+			case LOST -> "실종";
+			case SIGHT -> "목격";
+			case END -> "보호종료";
+		};
+	}
+
 	public static PostState fromString(String state) {
 		if (state == null) {
 			return null;

@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.duckdns.petfinderapp.domain.post.dto.request.CommonCreate;
 import org.duckdns.petfinderapp.domain.post.dto.request.CommonUpdate;
 import org.duckdns.petfinderapp.domain.post.dto.response.ResCommon;
+import org.duckdns.petfinderapp.domain.post.entity.PostCommon;
 import org.duckdns.petfinderapp.domain.post.service.PostService;
+import org.duckdns.petfinderapp.domain.similarity.dto.request.ImageAiEmbeddingRequest;
+import org.duckdns.petfinderapp.domain.similarity.service.EmbeddingService;
 import org.duckdns.petfinderapp.domain.user.entity.User;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,13 +20,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommonController {
     private final PostService commonService;
+    private final EmbeddingService embeddingService;
 
     // found 게시글 작성
     @PostMapping(value = "/posts/found", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Long create(@RequestPart(value = "image", required = false)List<MultipartFile> image,
                        @RequestPart(value = "json") CommonCreate requestDto,
                        @AuthenticationPrincipal User user) {
-        return commonService.create(requestDto, image, user);
+        PostCommon savedPost = commonService.create(requestDto, image, user);
+
+        // 이미지 임베딩 요청 이벤트 발행
+        embeddingService.sendOtherEmbeddingRequest(ImageAiEmbeddingRequest.of(savedPost));
+
+        return savedPost.getId();
     }
 
     // Found 상세 조회

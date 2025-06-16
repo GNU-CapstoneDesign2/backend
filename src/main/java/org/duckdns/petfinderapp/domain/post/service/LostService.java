@@ -4,11 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.duckdns.petfinderapp.domain.chat.entity.ChatRoom;
 import org.duckdns.petfinderapp.domain.chat.repository.ChatRoomRepository;
 import org.duckdns.petfinderapp.domain.post.dto.request.*;
-import org.duckdns.petfinderapp.domain.post.dto.response.ResCommon;
 import org.duckdns.petfinderapp.domain.post.dto.response.ResLost;
 import org.duckdns.petfinderapp.domain.post.entity.Image;
 import org.duckdns.petfinderapp.domain.post.entity.Lost;
+import org.duckdns.petfinderapp.domain.post.entity.PostCommon;
 import org.duckdns.petfinderapp.domain.post.repository.LostRepository;
+import org.duckdns.petfinderapp.domain.similarity.service.EmbeddingService;
 import org.duckdns.petfinderapp.domain.user.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,10 +25,11 @@ public class LostService {
     private final LostRepository lostRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final S3Uploader s3Uploader;
+    private final EmbeddingService embeddingService;
 
     // 게시글 작성
     @Transactional
-    public Long create(LostCreate dto, List<MultipartFile> image, User user) {
+    public PostCommon create(LostCreate dto, List<MultipartFile> image, User user) {
         CommonCreate commonDto = dto.getCommonCreate();
         ReqLost req = dto.getReqLost();
 
@@ -73,7 +74,7 @@ public class LostService {
             }
         }
 
-        return lostRepository.save(lost).getId();
+      return lostRepository.save(lost);
     }
 
     // Lost 조회
