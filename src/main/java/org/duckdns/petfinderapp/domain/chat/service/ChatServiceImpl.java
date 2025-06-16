@@ -46,8 +46,14 @@ public class ChatServiceImpl implements ChatService {
 		}
 		String messageContent = message.message();
 
-		PostCommon sharePost = postRepository.findById(message.post().postId())
-				.orElseThrow(PostNotFoundException::missingPost);
+		PostCommon sharePost;
+		if (message.post() == null) {
+			// 일반 채팅 메시지 처리
+			sharePost = null;
+		} else {
+			sharePost = postRepository.findById(message.post().postId())
+					.orElseThrow(PostNotFoundException::missingPost);
+		}
 
 		chatMessageRepository.save(ChatMessage.of(chatRoom.get(), sender.get(), messageContent, sharePost));
 
