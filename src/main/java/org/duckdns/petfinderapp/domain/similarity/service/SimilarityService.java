@@ -102,7 +102,7 @@ public class SimilarityService {
             null,
             "새로운 게시글",
             "등록된 게시글과 유사한 " + otherPost.getState().toKoreanString() + "글이 올라왔어요",
-            lostPost.getFirstImageUrl()+","+lostPost.getId().toString()
+            otherPost.getFirstImageUrl()+","+otherPost.getId().toString()
 				)
     );
 		log.info("유사 게시글 푸시 알림 전송: postId={}, user={}", otherPost.getId(), lostPost.getUser().getId());
