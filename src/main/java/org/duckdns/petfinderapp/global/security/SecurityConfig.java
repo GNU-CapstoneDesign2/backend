@@ -47,7 +47,7 @@ public class SecurityConfig {
             .requestMatchers(
                 "/auth/login/kakao",
                 "/ws/**",
-                "/posts/**"
+                "/similarity"
             ).permitAll()
             // 그 외의 모든 요청은 인증 필요
             .anyRequest().authenticated()
