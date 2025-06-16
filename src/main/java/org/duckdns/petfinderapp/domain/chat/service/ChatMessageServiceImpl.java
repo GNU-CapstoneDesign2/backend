@@ -8,7 +8,6 @@ import org.duckdns.petfinderapp.domain.chat.exception.ChatRoomAccessDeniedExcept
 import org.duckdns.petfinderapp.domain.chat.exception.ChatRoomNotFoundException;
 import org.duckdns.petfinderapp.domain.chat.repository.ChatMessageRepository;
 import org.duckdns.petfinderapp.domain.chat.repository.ChatRoomRepository;
-import org.duckdns.petfinderapp.domain.post.dto.PostInfoDto;
 import org.duckdns.petfinderapp.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,9 +31,8 @@ public class ChatMessageServiceImpl implements ChatMessageService {
             throw ChatRoomAccessDeniedException.accessDenied();
         }
 
-        PostInfoDto postInfoDto = PostInfoDto.of(chatRoom.getPost());
         Page<ChatMessage> chatMessagesPage = chatMessageRepository.findAllByChatRoomId(roomId, pageable);
 
-        return chatMessagesPage.map(message -> ChatMessageDto.of(message, postInfoDto));
+        return chatMessagesPage.map(ChatMessageDto::of);
     }
 }
