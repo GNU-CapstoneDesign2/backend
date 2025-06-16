@@ -11,12 +11,16 @@ import org.duckdns.petfinderapp.domain.push.entity.Push;
 import org.duckdns.petfinderapp.domain.push.repository.FcmTokenRepository;
 import org.duckdns.petfinderapp.domain.push.repository.PushRepository;
 import org.duckdns.petfinderapp.domain.user.entity.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class FcmService {
+
+    private static final Logger log = LoggerFactory.getLogger(FcmService.class);
     private final FcmTokenRepository fcmTokenRepository;
     private final PushRepository pushRepository;
 
@@ -34,6 +38,7 @@ public class FcmService {
 
     @Transactional
     public void sendMessage(User user, FcmResponseDto dto) {
+        log.info("FCM 메시지 전송 시작: user={}, dto={}", user.getId(), dto);
         String token = fcmTokenRepository.findByUser(user)
                 .map(FcmToken::getToken)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 토큰을 찾을 수 없습니다."));
