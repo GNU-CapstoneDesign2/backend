@@ -7,6 +7,7 @@ import org.duckdns.petfinderapp.domain.chat.dto.ChatRoomDto;
 import org.duckdns.petfinderapp.domain.chat.dto.ChatRoomPostDto;
 import org.duckdns.petfinderapp.domain.chat.dto.request.ChatRoomCreateResponse;
 import org.duckdns.petfinderapp.domain.chat.dto.resposne.ChatRoomCreateRequest;
+import org.duckdns.petfinderapp.domain.chat.dto.resposne.UnreadMessageResponse;
 import org.duckdns.petfinderapp.domain.chat.service.ChatMessageService;
 import org.duckdns.petfinderapp.domain.chat.service.ChatRoomService;
 import org.duckdns.petfinderapp.domain.user.entity.User;
@@ -70,5 +71,15 @@ public class ChatRoomController {
 
         ChatRoomCreateResponse chatRoom = chatRoomService.createChatRoom(user, chatRoomCreateRequest);
         return ApiResponse.onSuccess(HttpStatus.CREATED, "채팅방 생성 성공", chatRoom);
+    }
+
+    @GetMapping("/unread")
+    public ApiResponse<UnreadMessageResponse> getUnreadChatRooms(
+            @AuthenticationPrincipal User user
+    ) {
+        return ApiResponse.onSuccess(
+            HttpStatus.OK,
+            "전체 채팅 안 읽은 수 조회 성공",
+            chatRoomService.getUnreadChatRoomMessageCount(user));
     }
 }
