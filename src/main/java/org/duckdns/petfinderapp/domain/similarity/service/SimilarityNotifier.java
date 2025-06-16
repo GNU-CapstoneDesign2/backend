@@ -25,14 +25,13 @@ public class SimilarityNotifier {
 		SseEmitter emitter = new SseEmitter(30_000L); // 30초 타임아웃 설정
 		log.debug("SSE registered for postId: {}", postId);
 
-		ScheduledFuture<?> future = taskScheduler.scheduleAtFixedRate(
-			() -> {
+		ScheduledFuture<?> future = taskScheduler.scheduleAtFixedRate(() -> {
 				try {
 					emitter.send(SseEmitter.event()
 						.name("ping")
 						.data("keep-alive")
 					);
-				} catch (IOException e) {
+				} catch (IOException | IllegalStateException e) {
 					emitter.completeWithError(e);
 				}
 			}, Duration.ofSeconds(20) // 20초 주기로 ping 이벤트 전송
@@ -52,7 +51,7 @@ public class SimilarityNotifier {
 					.name("ping")
 					.data("keep-alive")
 			);
-		} catch (IOException e) {
+		} catch (IOException | IllegalStateException e) {
 			log.warn("Initial ping failed for postId: {}", postId, e);
 			cleanupTask.run();
 			return emitter;
@@ -80,7 +79,7 @@ public class SimilarityNotifier {
 					.data(response)
 				);
 				emitter.complete();
-			} catch (IOException e) {
+			} catch (IOException | IllegalStateException e) {
 				emitter.completeWithError(e);
 			}
 		}
