@@ -122,4 +122,8 @@ public class PostCommon {
 		if (image.getCommon() != this)
             image.setCommon(this);
     }
+
+    public String getFirstImageUrl() {
+      return images.isEmpty() ? null : images.get(0).getFileURL();
+    }
 }
