@@ -52,7 +52,7 @@ public class ChatServiceImpl implements ChatService {
 			sharePost = null;
 		} else {
 			sharePost = postRepository.findById(message.post().postId())
-					.orElseThrow(PostNotFoundException::missingPost);
+					.orElseThrow(PostNotFoundException::missingPostCommon);
 		}
 
 		chatMessageRepository.save(ChatMessage.of(chatRoom.get(), sender.get(), messageContent, sharePost));
