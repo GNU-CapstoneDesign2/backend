@@ -44,7 +44,7 @@ public class ChatMessage {
 
     /** 공유 게시글 */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "share_post_id", nullable = false)
+    @JoinColumn(name = "share_post_id", nullable = true)
     private PostCommon sharePost;
 
 
