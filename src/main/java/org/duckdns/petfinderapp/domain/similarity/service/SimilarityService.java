@@ -71,33 +71,41 @@ public class SimilarityService {
   }
 
   private void processOtherSimilarity(Long postId, PostState postState) {
-    PostCommon postCommon = postRepository.findById(postId)
+    PostCommon otherPost = postRepository.findById(postId)
         .orElseThrow(PostNotFoundException::missingPostCommon);
 
     SimilarityRequest similarityRequest = SimilarityRequest.of(postId, postState,
-        getImageUrl(postCommon));
+        getImageUrl(otherPost));
     ImageAiSimilarityResponse response = imageAiClient.fetchSimilarLostPosts(similarityRequest);
     log.info("유사 실종 게시글 조회 완료: postId={}, response={}", postId, response);
 
     saveSimilarResponse(postState, response);
 
-    response.postIdList().forEach(this::sendSimilarPostPushNotification);
+    response.postIdList().forEach(lostPostId -> {
+      try {
+        this.sendSimilarPostPushNotification(otherPost, lostPostId);
+      } catch (PostNotFoundException e) {
+        log.warn("존재하지 않는 게시글, 알림 스킵: {}", lostPostId);
+      } catch (Exception e) {
+        log.error("알림 전송 중 오류 발생, 계속 진행: lostPostId={}, {}", lostPostId, e.getMessage());
+      }
+    });
   }
 
-  private void sendSimilarPostPushNotification(Long postId) {
-    PostCommon post = postRepository.findById(postId)
+  private void sendSimilarPostPushNotification(PostCommon otherPost, Long lostPostId) {
+    PostCommon lostPost = postRepository.findById(lostPostId)
         .orElseThrow(PostNotFoundException::missingPostCommon);
 
 		fcmService.sendMessage(
-        post.getUser(),
+        lostPost.getUser(),
         FcmResponseDto.of(
             null,
             "새로운 게시글",
-            "등록된 게시글과 유사한 " + post.getState().toKoreanString() + "글이 올라왔어요",
-            post.getFirstImageUrl()+","+post.getId().toString()
+            "등록된 게시글과 유사한 " + otherPost.getState().toKoreanString() + "글이 올라왔어요",
+            lostPost.getFirstImageUrl()+","+lostPost.getId().toString()
 				)
     );
-		log.info("유사 게시글 푸시 알림 전송: postId={}, user={}", postId, post.getUser().getId());
+		log.info("유사 게시글 푸시 알림 전송: postId={}, user={}", otherPost.getId(), lostPost.getUser().getId());
   }
 
   private List<Similarity> saveSimilarResponse(PostState postState,
