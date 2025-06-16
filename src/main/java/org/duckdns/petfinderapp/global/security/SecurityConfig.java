@@ -46,8 +46,7 @@ public class SecurityConfig {
             // 카카오 로그인 엔드포인트는 인증 없이 허용
             .requestMatchers(
                 "/auth/login/kakao",
-                "/ws/**",
-                "/posts/**"
+                "/ws/**"
             ).permitAll()
             // 그 외의 모든 요청은 인증 필요
             .anyRequest().authenticated()
