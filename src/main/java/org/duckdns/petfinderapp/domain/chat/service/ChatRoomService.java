@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.duckdns.petfinderapp.domain.chat.dto.ChatRoomDto;
 import org.duckdns.petfinderapp.domain.chat.dto.ChatRoomPostDto;
 import org.duckdns.petfinderapp.domain.chat.dto.request.ChatRoomCreateResponse;
-import org.duckdns.petfinderapp.domain.chat.dto.resposne.ChatRoomCreateRequest;
+import org.duckdns.petfinderapp.domain.chat.dto.response.ChatRoomCreateRequest;
+import org.duckdns.petfinderapp.domain.chat.dto.response.UnreadMessageResponse;
 import org.duckdns.petfinderapp.domain.chat.entity.ChatMessage;
 import org.duckdns.petfinderapp.domain.chat.entity.ChatRoom;
 import org.duckdns.petfinderapp.domain.chat.exception.ChatRoomConflictException;
 import org.duckdns.petfinderapp.domain.chat.exception.ChatRoomNotFoundException;
+import org.duckdns.petfinderapp.domain.chat.repository.ChatMessageRepository;
 import org.duckdns.petfinderapp.domain.chat.repository.ChatRoomRepository;
 import org.duckdns.petfinderapp.domain.post.dto.response.PostSummaryResponse;
 import org.duckdns.petfinderapp.domain.post.entity.PostCommon;
@@ -28,6 +30,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatMessageRepository chatMessageRepository;
     private final PostRepository postRepository;
 
     @Transactional(readOnly = true)
@@ -117,5 +120,15 @@ public class ChatRoomService {
         ChatRoom chatRoom = ChatRoom.of(post, user, post.getUser());
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
         return ChatRoomCreateResponse.of(savedChatRoom);
+    }
+
+    @Transactional(readOnly = true)
+    public UnreadMessageResponse getUnreadChatRoomMessageCount(User user) {
+      List<ChatRoom> chatRoomList = chatRoomRepository.findChatRoomsByUserIdOrderByLatest(user.getId());
+
+      List<ChatMessage> unreadMessages = chatMessageRepository
+          .findByChatRoomInAndIsReadFalseAndSenderNot(chatRoomList, user);
+
+      return UnreadMessageResponse.from(unreadMessages.size());
     }
 }

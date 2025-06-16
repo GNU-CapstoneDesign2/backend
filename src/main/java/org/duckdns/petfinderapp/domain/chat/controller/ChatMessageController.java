@@ -1,6 +1,7 @@
 package org.duckdns.petfinderapp.domain.chat.controller;
 
 import org.duckdns.petfinderapp.domain.chat.dto.ChatMessageDto;
+import org.duckdns.petfinderapp.domain.chat.dto.response.ReadMessageDto;
 import org.duckdns.petfinderapp.domain.chat.service.ChatService;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -23,5 +24,14 @@ public class ChatMessageController {
 		@Payload @Valid ChatMessageDto messageDto
 	) {
 		chatService.processMessage(roomId, messageDto);
+	}
+
+	@Transactional
+	@MessageMapping("/chatrooms/{roomId}/read")
+	public void handleReadMessage(
+			@DestinationVariable Long roomId,
+			@Payload @Valid ReadMessageDto readMessageDto
+	) {
+		chatService.processReadMessage(roomId, readMessageDto);
 	}
 }

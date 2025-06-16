@@ -2,6 +2,7 @@ package org.duckdns.petfinderapp.domain.chat.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.duckdns.petfinderapp.domain.post.entity.PostCommon;
 import org.duckdns.petfinderapp.domain.user.entity.User;
 
 import java.time.LocalDateTime;
@@ -41,13 +42,20 @@ public class ChatMessage {
     @Column(nullable = false)
     private Boolean isRead;
 
-	public static ChatMessage of(ChatRoom chatRoom, User sender, String message) {
+    /** 공유 게시글 */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "share_post_id", nullable = true)
+    private PostCommon sharePost;
+
+
+	public static ChatMessage of(ChatRoom chatRoom, User sender, String message, PostCommon sharePost) {
         return ChatMessage.builder()
             .createAt(LocalDateTime.now())
             .chatRoom(chatRoom)
             .sender(sender)
             .content(message)
             .isRead(false) // 기본값은 읽지 않은 상태로 설정
+            .sharePost(sharePost)
             .build();
 	}
 }

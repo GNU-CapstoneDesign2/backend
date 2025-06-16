@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record ChatMessageDto(
+	Long messageId,
 	@NotNull
 	Long senderId,
 	@NotBlank
@@ -19,12 +20,13 @@ public record ChatMessageDto(
 	PostInfoDto post,
 	Boolean isRead
 ) {
-	public static ChatMessageDto of(ChatMessage chatMessage, PostInfoDto postInfoDto) {
+	public static ChatMessageDto of(ChatMessage chatMessage) {
 		return ChatMessageDto.builder()
+			.messageId(chatMessage.getId())
 			.senderId(chatMessage.getSender().getId())
 			.message(chatMessage.getContent())
 			.createAt(chatMessage.getCreateAt())
-			.post(postInfoDto)
+			.post(chatMessage.getSharePost() != null ? PostInfoDto.of(chatMessage.getSharePost()) : null)
 			.isRead(chatMessage.getIsRead())
 			.build();
 	}
