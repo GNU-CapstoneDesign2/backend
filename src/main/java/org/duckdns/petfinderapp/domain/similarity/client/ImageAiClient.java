@@ -31,13 +31,13 @@ public class ImageAiClient {
 
 	public ImageAiSimilarityResponse fetchSimilarLostPosts(SimilarityRequest similarityRequest) {
 		//TODO: 테스트용 모킹
-		return new ImageAiSimilarityResponse(1L, 3, List.of(1L, 2L, 3L));
+//		return new ImageAiSimilarityResponse(1L, 3, List.of(1L, 2L, 3L));
 
-//		return webClient.post()
-//			.uri(uriBuilder ->uriBuilder.path("/find_missing_with_sighting_forAlarm").build())
-//			.body(Mono.just(similarityRequest), SimilarityRequest.class)
-//			.exchangeToMono(this::handleResponse)
-//			.block();
+		return webClient.post()
+			.uri(uriBuilder ->uriBuilder.path("/find_missing_with_sighting_forAlarm").build())
+			.body(Mono.just(similarityRequest), SimilarityRequest.class)
+			.exchangeToMono(this::handleResponse)
+			.block();
 	}
 
 	public void fetchEmbeddingLostRequest(ImageAiEmbeddingRequest request) {

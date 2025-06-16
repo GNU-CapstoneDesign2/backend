@@ -52,7 +52,7 @@ public class SimilarityService {
 
 		SimilarityRequest similarityRequest = SimilarityRequest.of(postId, postState, getImageUrl(postCommon));
 		ImageAiSimilarityResponse response = imageAiClient.fetchSimilarOtherPosts(similarityRequest);
-		log.info("유사 게시글 조회 완료: postId={}, response={}", postId, response);
+		log.info("유사 목격/입양/공고 게시글 조회 완료: postId={}, response={}", postId, response);
 
 		List<Similarity> savedSimilarityList = saveSimilarResponse(postState, response);
 
@@ -74,6 +74,7 @@ public class SimilarityService {
 
 		SimilarityRequest similarityRequest = SimilarityRequest.of(postId, postState, getImageUrl(postCommon));
 		ImageAiSimilarityResponse response = imageAiClient.fetchSimilarLostPosts(similarityRequest);
+		log.info("유사 실종 게시글 조회 완료: postId={}, response={}", postId, response);
 
 		saveSimilarResponse(postState, response);
 
@@ -83,11 +84,12 @@ public class SimilarityService {
 	private void sendSimilarPostPushNotification(Long postId) {
 		PostCommon post = postRepository.findById(postId)
 			.orElseThrow(PostNotFoundException::missingPostCommon);
-		 fcmService.sendMessage(
-		 	post.getUser(),
-		 	"유사 게시글 알림",
-		 	String.format("등록된 게시글과 유사한 %s글이 올라왔어요", post.getState().toKoreanString())
-		 );
+		// TODO: 푸시 알림 전송 활성화하기
+//		 fcmService.sendMessage(
+//		 	post.getUser(),
+//		 	"유사 게시글 알림",
+//		 	String.format("등록된 게시글과 유사한 %s글이 올라왔어요", post.getState().toKoreanString())
+//		 );
 	}
 
 	private List<Similarity> saveSimilarResponse(PostState postState, ImageAiSimilarityResponse response) {
@@ -109,6 +111,7 @@ public class SimilarityService {
 				}
 			})
 			.toList();
+
 		return similarityRepository.saveAll(similarityList);
 	}
 
