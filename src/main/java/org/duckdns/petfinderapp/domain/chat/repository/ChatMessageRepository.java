@@ -10,12 +10,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
     List<ChatMessage> findByChatRoomInAndIsReadFalseAndSenderNot(List<ChatRoom> chatRoomList, User sender);
 
     Page<ChatMessage> findAllByChatRoomId(Long roomId, Pageable pageable);
 
+    @Transactional
     @Modifying
     @Query("UPDATE ChatMessage m SET m.isRead = true " +
         "WHERE m.chatRoom.id = :chatRoomId " +
