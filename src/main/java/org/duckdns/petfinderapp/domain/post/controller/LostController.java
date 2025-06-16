@@ -29,8 +29,7 @@ public class LostController {
     public Long create(@RequestPart(value = "image", required = false) List<MultipartFile> image,
                        @RequestPart(value = "json") LostCreate requestDto,
                        @AuthenticationPrincipal User user) {
-        User usert = userRepository.findById(1L).get();
-        PostCommon savedPost = lostService.create(requestDto, image, usert);
+        PostCommon savedPost = lostService.create(requestDto, image, user);
         // 이미지 임베딩 요청 이벤트 발행
         embeddingService.sendLostEmbeddingRequest(ImageAiEmbeddingRequest.of(savedPost));
         return savedPost.getId();
