@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     String token = null;
     String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-    if (header != null && header.equals("Bearer ")) {
+    if (header != null && header.startsWith("Bearer ")) {
       token = header.substring(7);
     } else {
       String param = request.getParameter("token");
