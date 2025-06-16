@@ -25,63 +25,89 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class ChatServiceImpl implements ChatService {
-	private final SimpMessagingTemplate messagingTemplate;
-	private final ChatMessageRepository chatMessageRepository;
-	private final UserRepository userRepository;
-	private final ChatRoomRepository chatRoomRepository;
-	private final PostRepository postRepository;
 
-	@Override
-	public void processMessage(Long roomId, ChatMessageDto message) {
-		String destination = "/topic/chatrooms/" + roomId;
-		Optional<User> sender = userRepository.findById(message.senderId());
-		if (sender.isEmpty()) {
-		 log.error("User not found: " + message.senderId());
-		 return;
-		}
-		Optional<ChatRoom> chatRoom = chatRoomRepository.findById(roomId);
-		if (chatRoom.isEmpty()) {
-			log.error("Chat room not found: " + roomId);
-			return;
-		}
-		String messageContent = message.message();
+  private final SimpMessagingTemplate messagingTemplate;
+  private final ChatMessageRepository chatMessageRepository;
+  private final UserRepository userRepository;
+  private final ChatRoomRepository chatRoomRepository;
+  private final PostRepository postRepository;
 
-		PostCommon sharePost;
-		if (message.post() == null) {
-			// 일반 채팅 메시지 처리
-			sharePost = null;
-		} else {
-			sharePost = postRepository.findById(message.post().postId())
-					.orElseThrow(PostNotFoundException::missingPostCommon);
-		}
+  @Override
+  public void processMessage(Long roomId, ChatMessageDto message) {
+    log.debug("[processMessage] 진입: roomId={}, messageDto={}", roomId, message);
 
-		chatMessageRepository.save(ChatMessage.of(chatRoom.get(), sender.get(), messageContent, sharePost));
+    Optional<User> sender = userRepository.findById(message.senderId());
+    log.debug("[processMessage] sender 조회: senderId={} → exists={}", message.senderId(),
+        sender.isPresent());
 
-		messagingTemplate.convertAndSend(destination, message);
-	}
+    if (sender.isEmpty()) {
+      log.error("User not found: " + message.senderId());
+      return;
+    }
+    Optional<ChatRoom> chatRoom = chatRoomRepository.findById(roomId);
+    log.debug("[processMessage] chatRoom 조회: roomId={} → exists={}", roomId, chatRoom.isPresent());
 
-	@Override
-	public void processReadMessage(Long roomId, ReadMessageDto message) {
-		String destination = "/topic/chatrooms/" + roomId + "/read";
-		// 1. DTO에서 값 꺼내기
-		Long userId  = message.userId();
-		Long lastReadMessageId = message.lastReadMessageId();
+    if (chatRoom.isEmpty()) {
+      log.error("Chat room not found: " + roomId);
+      return;
+    }
+    ChatRoom room = chatRoom.get();
+    log.debug("  ↳ chatRoom found: id={}, sender={}, receiver={}",
+        room.getId(), room.getSender().getId(), room.getReceiver().getId());
 
-		// 2. 채팅방 존재 & 권한 검증
-		ChatRoom room = chatRoomRepository.findById(roomId)
-				.orElseThrow(ChatRoomNotFoundException::missingChatRoom);
+    User senderUser = sender.get();
+    log.debug("  ↳ sender found: id={}, name={}", senderUser.getId(), senderUser.getName());
 
-		User user = userRepository.getReferenceById(userId);
-		if (!room.getSender().getId().equals(user.getId()) &&
-				!room.getReceiver().getId().equals(user.getId())) {
-			throw ChatRoomAccessDeniedException.accessDenied();
-		}
+    String messageContent = message.message();
 
-		// 3. 읽음 처리 로직
-		// lastReadMessageId 이전 메시지는 모두 읽음 처리
-		chatMessageRepository.updateIsReadByLastReadMessage(roomId, userId, lastReadMessageId);
+    PostCommon sharePost = null;
+    if (message.post() != null) {
+      try {
+        sharePost = postRepository.findById(message.post().postId())
+            .orElseThrow(PostNotFoundException::missingPostCommon);
+        log.debug("  ↳ sharePost found: id={}", sharePost.getId());
+      } catch (Exception e) {
+        log.error("[warn] shared post lookup failed: {}", e.getMessage());
+      }
+    }
 
-		// 4. 읽음 처리된 메시지 전송
-		messagingTemplate.convertAndSend(destination, message);
-	}
+    ChatMessage saved = chatMessageRepository.save(
+        ChatMessage.of(room, senderUser, messageContent, sharePost));
+    log.info("  ↳ message saved: messageId={}", saved.getId());
+
+    String destination = "/topic/chatrooms/" + roomId;
+    log.info("  ↳ sending to destination={} payload={}", destination, message);
+    // 5. 메시지 전송
+    try {
+      messagingTemplate.convertAndSend(destination, message);
+      log.info("  ↳ message sent successfully");
+    } catch (Exception e) {
+      log.error("Failed to send message: {}", e.getMessage());
+    }
+  }
+
+  @Override
+  public void processReadMessage(Long roomId, ReadMessageDto message) {
+    String destination = "/topic/chatrooms/" + roomId + "/read";
+    // 1. DTO에서 값 꺼내기
+    Long userId = message.userId();
+    Long lastReadMessageId = message.lastReadMessageId();
+
+    // 2. 채팅방 존재 & 권한 검증
+    ChatRoom room = chatRoomRepository.findById(roomId)
+        .orElseThrow(ChatRoomNotFoundException::missingChatRoom);
+
+    User user = userRepository.getReferenceById(userId);
+    if (!room.getSender().getId().equals(user.getId()) &&
+        !room.getReceiver().getId().equals(user.getId())) {
+      throw ChatRoomAccessDeniedException.accessDenied();
+    }
+
+    // 3. 읽음 처리 로직
+    // lastReadMessageId 이전 메시지는 모두 읽음 처리
+    chatMessageRepository.updateIsReadByLastReadMessage(roomId, userId, lastReadMessageId);
+
+    // 4. 읽음 처리된 메시지 전송
+    messagingTemplate.convertAndSend(destination, message);
+  }
 }
